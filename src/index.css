@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black text-white;
+}
+
+ion-content {
+  --background: #000000;
+}
+
+ion-toolbar {
+  --background: #000000;
+  --border-color: #404040;
+}
+
+ion-item {
+  --background: #2f2f2f;
+  --border-color: #404040;
+}
