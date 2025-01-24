@@ -2,6 +2,24 @@ import { useState } from 'react';
 import { IonContent, IonPage, useIonToast, useIonLoading } from '@ionic/react';
 import { supabase } from '../utils/supabaseClient';
 import { useHistory, Link } from 'react-router-dom';
+import { 
+  TextField, 
+  Button, 
+  Box, 
+  Typography, 
+  Container, 
+  Paper,
+  InputAdornment,
+  IconButton,
+  Divider,
+  Alert
+} from '@mui/material';
+import { 
+  Email as EmailIcon, 
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff
+} from '@mui/icons-material';
 
 interface LoginFormData {
   email: string;
@@ -16,6 +34,7 @@ interface ValidationErrors {
 export const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showPassword, setShowPassword] = useState(false);
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
   const history = useHistory();
@@ -70,101 +89,127 @@ export const LoginPage: React.FC = () => {
   return (
     <IonPage>
       <IonContent className="ion-padding">
-        <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-black text-white">
-          <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <h2 className="text-4xl font-bold text-center mb-2">Welcome Back</h2>
-            <p className="text-center text-gray-400 text-lg">
-              Sign in to your account
-            </p>
-          </div>
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Paper
+              elevation={3}
+              sx={{
+                p: 4,
+                width: '100%',
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+              }}
+            >
+              <Box sx={{ mb: 3, textAlign: 'center' }}>
+                <Typography component="h1" variant="h4" fontWeight="bold" gutterBottom>
+                  Welcome Back
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Sign in to your account
+                </Typography>
+              </Box>
 
-          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div className="py-8 px-4 sm:px-10">
-              <form onSubmit={handleLogin} className="space-y-6">
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                    Email address
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      className={`appearance-none block w-full px-3 py-3 border ${
-                        errors.email ? 'border-red-500' : 'border-gray-700'
-                      } rounded-lg bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent`}
-                      placeholder="Enter your email"
-                    />
-                    {errors.email && (
-                      <p className="mt-2 text-sm text-red-500">{errors.email}</p>
-                    )}
-                  </div>
-                </div>
+              <form onSubmit={handleLogin}>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  id="email"
+                  label="Email Address"
+                  variant="outlined"
+                  value={formData.email}
+                  onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  error={!!errors.email}
+                  helperText={errors.email}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                    Password
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      id="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                      className={`appearance-none block w-full px-3 py-3 border ${
-                        errors.password ? 'border-red-500' : 'border-gray-700'
-                      } rounded-lg bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent`}
-                      placeholder="Enter your password"
-                    />
-                    {errors.password && (
-                      <p className="mt-2 text-sm text-red-500">{errors.password}</p>
-                    )}
-                  </div>
-                </div>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  id="password"
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
+                  variant="outlined"
+                  value={formData.password}
+                  onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  error={!!errors.password}
+                  helperText={errors.password}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <LockIcon color="action" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <a href="#" className="font-medium text-emerald-500 hover:text-emerald-400">
+                <Box sx={{ mt: 2, mb: 2, textAlign: 'right' }}>
+                  <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
+                    <Typography color="primary" variant="body2">
                       Forgot your password?
-                    </a>
-                  </div>
-                </div>
+                    </Typography>
+                  </Link>
+                </Box>
 
-                <div>
-                  <button
-                    type="submit"
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                  >
-                    Sign in
-                  </button>
-                </div>
-              </form>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  sx={{ 
+                    mt: 2,
+                    mb: 3,
+                    height: 48,
+                    bgcolor: 'primary.main',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                    },
+                  }}
+                >
+                  Sign In
+                </Button>
 
-              <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-700" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-black text-gray-400">Or</span>
-                  </div>
-                </div>
+                <Box sx={{ mt: 3, textAlign: 'center' }}>
+                  <Divider sx={{ mb: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      OR
+                    </Typography>
+                  </Divider>
 
-                <div className="mt-6">
-                  <div className="text-sm text-center">
-                    <Link 
-                      to="/register" 
-                      className="font-medium text-emerald-500 hover:text-emerald-400"
-                    >
+                  <Link to="/register" style={{ textDecoration: 'none' }}>
+                    <Typography color="primary" variant="body2">
                       Don't have an account? Sign up
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                    </Typography>
+                  </Link>
+                </Box>
+              </form>
+            </Paper>
+          </Box>
+        </Container>
       </IonContent>
     </IonPage>
   );
