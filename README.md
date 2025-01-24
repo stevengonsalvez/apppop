@@ -59,7 +59,6 @@ VITE_APP_SUPABASE_URL=your_supabase_url
 VITE_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
 AIRTABLE_API_KEY=your_airtable_api_key
 AIRTABLE_BASE_ID=your_airtable_base_id
-SUPABASE_ACCESS_TOKEN=your_supabase_access_token
 VITE_APP_STRIPE_PUBLIC_KEY=your_stripe_public_key
 ```
 
