@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { IonContent, IonPage, useIonToast, useIonLoading } from '@ionic/react';
 import { supabase } from '../utils/supabaseClient';
 import { useHistory, Link } from 'react-router-dom';
 import { 
@@ -12,7 +11,9 @@ import {
   InputAdornment,
   IconButton,
   Divider,
-  Alert
+  Alert,
+  Snackbar,
+  CircularProgress
 } from '@mui/material';
 import { 
   Email as EmailIcon, 
@@ -35,8 +36,8 @@ export const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [showLoading, hideLoading] = useIonLoading();
-  const [showToast] = useIonToast();
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
   const history = useHistory();
 
   const validateForm = (): boolean => {
@@ -68,149 +69,154 @@ export const LoginPage: React.FC = () => {
     
     if (!validateForm()) return;
 
-    await showLoading();
+    setLoading(true);
     try {
       const { error } = await supabase.auth.signIn(formData);
       if (error) throw error;
       
       history.push('/home');
     } catch (error: any) {
-      await showToast({ 
+      setToast({ 
         message: error.message,
-        duration: 3000,
-        color: 'danger',
-        position: 'bottom'
+        open: true
       });
     } finally {
-      await hideLoading();
+      setLoading(false);
     }
   };
 
   return (
-    <IonPage>
-      <IonContent className="ion-padding">
-        <Container component="main" maxWidth="xs">
-          <Box
-            sx={{
-              minHeight: '100vh',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Paper
-              elevation={3}
-              sx={{
-                p: 4,
-                width: '100%',
-                bgcolor: 'background.paper',
-                borderRadius: 2,
+    <Box sx={{ 
+      minHeight: '100vh',
+      bgcolor: 'background.default',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      p: 2
+    }}>
+      <Container component="main" maxWidth="xs">
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            width: '100%',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+          }}
+        >
+          <Box sx={{ mb: 3, textAlign: 'center' }}>
+            <Typography component="h1" variant="h4" fontWeight="bold" gutterBottom>
+              Welcome Back
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Sign in to your account
+            </Typography>
+          </Box>
+
+          <form onSubmit={handleLogin}>
+            <TextField
+              fullWidth
+              margin="normal"
+              id="email"
+              label="Email Address"
+              variant="outlined"
+              value={formData.email}
+              onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              error={!!errors.email}
+              helperText={errors.email}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              fullWidth
+              margin="normal"
+              id="password"
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              variant="outlined"
+              value={formData.password}
+              onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              error={!!errors.password}
+              helperText={errors.password}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box sx={{ mt: 2, mb: 2, textAlign: 'right' }}>
+              <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
+                <Typography color="primary" variant="body2">
+                  Forgot your password?
+                </Typography>
+              </Link>
+            </Box>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{ 
+                mt: 2,
+                mb: 3,
+                height: 48,
+                bgcolor: 'primary.main',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                },
               }}
             >
-              <Box sx={{ mb: 3, textAlign: 'center' }}>
-                <Typography component="h1" variant="h4" fontWeight="bold" gutterBottom>
-                  Welcome Back
+              {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
+            </Button>
+
+            <Box sx={{ mt: 3, textAlign: 'center' }}>
+              <Divider sx={{ mb: 3 }}>
+                <Typography variant="body2" color="text.secondary">
+                  OR
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Sign in to your account
+              </Divider>
+
+              <Link to="/register" style={{ textDecoration: 'none' }}>
+                <Typography color="primary" variant="body2">
+                  Don't have an account? Sign up
                 </Typography>
-              </Box>
+              </Link>
+            </Box>
+          </form>
+        </Paper>
+      </Container>
 
-              <form onSubmit={handleLogin}>
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  id="email"
-                  label="Email Address"
-                  variant="outlined"
-                  value={formData.email}
-                  onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  error={!!errors.email}
-                  helperText={errors.email}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <TextField
-                  fullWidth
-                  margin="normal"
-                  id="password"
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  variant="outlined"
-                  value={formData.password}
-                  onChange={e => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  error={!!errors.password}
-                  helperText={errors.password}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <Box sx={{ mt: 2, mb: 2, textAlign: 'right' }}>
-                  <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
-                    <Typography color="primary" variant="body2">
-                      Forgot your password?
-                    </Typography>
-                  </Link>
-                </Box>
-
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  sx={{ 
-                    mt: 2,
-                    mb: 3,
-                    height: 48,
-                    bgcolor: 'primary.main',
-                    '&:hover': {
-                      bgcolor: 'primary.dark',
-                    },
-                  }}
-                >
-                  Sign In
-                </Button>
-
-                <Box sx={{ mt: 3, textAlign: 'center' }}>
-                  <Divider sx={{ mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      OR
-                    </Typography>
-                  </Divider>
-
-                  <Link to="/register" style={{ textDecoration: 'none' }}>
-                    <Typography color="primary" variant="body2">
-                      Don't have an account? Sign up
-                    </Typography>
-                  </Link>
-                </Box>
-              </form>
-            </Paper>
-          </Box>
-        </Container>
-      </IonContent>
-    </IonPage>
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={3000}
+        onClose={() => setToast(prev => ({ ...prev, open: false }))}
+      >
+        <Alert severity="error" onClose={() => setToast(prev => ({ ...prev, open: false }))}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };

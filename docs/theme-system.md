@@ -1,62 +1,8 @@
-# Ionic Template App
+# Theme System
 
-A modern React template with Material UI components, Supabase authentication, and TypeScript.
+The app includes a comprehensive theme system with configurable color schemes and font configurations.
 
-## Features
-
-### 🔐 Authentication & Authorization
-- Supabase authentication
-- Protected routes
-- User profile management
-
-### 🎨 UI Components
-- Material UI v5 components
-- Responsive layout with:
-  - Left drawer navigation (desktop)
-  - Bottom navigation bar (mobile)
-  - App bar with notifications
-- Dark mode support
-- Cookie consent management
-- Loading states and error handling
-
-### 📊 Analytics
-- Microsoft Clarity integration with privacy controls
-- Cookie-based consent management
-- Analytics opt-in/opt-out functionality
-
-## Documentation
-
-Detailed documentation is available in the `docs` folder:
-
-- [Setup Guide](docs/setup.md) - Initial setup and configuration
-- [Theme System](docs/theme-system.md) - Color schemes and font configuration
-- [Analytics](docs/analytics.md) - Analytics integration and privacy controls
-- [Components](docs/components.md) - Available components and usage
-- [Project Structure](docs/project-structure.md) - Codebase organization
-- [Development Guide](docs/development.md) - Development workflow and best practices
-
-## Quick Start
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd ionic-template
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-
-# Start development server
-npm run dev
-```
-
-See the [Setup Guide](docs/setup.md) for complete installation instructions.
-
-## Theme System
-
-### Color System
+## Color System
 
 Each color scheme includes:
 
@@ -136,46 +82,6 @@ The app comes with several pre-configured color schemes:
 
 Each color scheme includes both light and dark mode variants.
 
-### Configuring the Theme
-
-1. **Default Theme**
-
-   Set your preferred default theme in `src/config/theme.config.ts`:
-
-   ```typescript
-   export const themeConfig = {
-     defaultColorScheme: 'ocean', // Choose from available schemes
-     defaultDarkMode: false,      // Set dark mode as default
-     persistTheme: true,          // Save preferences to localStorage
-   };
-   ```
-
-2. **Runtime Theme Changes**
-
-   Use the theme hooks in your components:
-
-   ```typescript
-   import { useTheme } from '../contexts/ThemeContext';
-
-   const MyComponent = () => {
-     const { setColorScheme, toggleDarkMode } = useTheme();
-
-     // Change color scheme
-     const handleSchemeChange = () => {
-       setColorScheme('sunset');
-     };
-
-     // Toggle dark mode
-     const handleDarkMode = () => {
-       toggleDarkMode();
-     };
-   };
-   ```
-
-3. **Theme Persistence**
-
-   Theme preferences are automatically saved to localStorage when `persistTheme` is enabled in the config.
-
 ### Creating Custom Color Schemes
 
 Add your own color scheme in `src/theme/colorScheme.ts`:
@@ -224,7 +130,7 @@ export const colorSchemes = {
 } as const;
 ```
 
-### Font System
+## Font System
 
 Each font scheme includes:
 
@@ -252,48 +158,73 @@ The app comes with several pre-configured font schemes:
 - `classic` - Roboto with Roboto Slab as secondary
 - `minimal` - System fonts for a native feel
 
-### Configuring Fonts
+### Creating Custom Font Schemes
 
-1. **Default Font Scheme**
+Add your own font scheme in `src/theme/fontScheme.ts`:
 
-   Set your preferred default font scheme in `src/config/theme.config.ts`:
+```typescript
+export const myCustomScheme: FontScheme = {
+  fontFamily: {
+    primary: '"Your-Font", "Fallback-Font", sans-serif',
+    secondary: '"Optional-Secondary-Font", serif',
+  },
+  fontWeights: {
+    light: 300,
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+  },
+  letterSpacing: {
+    tight: '-0.02em',
+    normal: '0em',
+    wide: '0.02em',
+  },
+};
 
-   ```typescript
-   export const themeConfig = {
-     defaultColorScheme: 'sunset',
-     defaultFontScheme: 'modern',    // Choose from available schemes
-     defaultDarkMode: false,
-     persistTheme: true,
-   };
-   ```
+// Add to fontSchemes object
+export const fontSchemes = {
+  // ... existing schemes
+  custom: myCustomScheme,
+} as const;
+```
 
-2. **Creating Custom Font Schemes**
+## Theme Configuration
 
-   Add your own font scheme in `src/theme/fontScheme.ts`:
+Configure default theme settings in `src/config/theme.config.ts`:
 
-   ```typescript
-   export const myCustomScheme: FontScheme = {
-     fontFamily: {
-       primary: '"Your-Font", "Fallback-Font", sans-serif',
-       secondary: '"Optional-Secondary-Font", serif',
-     },
-     fontWeights: {
-       light: 300,
-       regular: 400,
-       medium: 500,
-       semibold: 600,
-       bold: 700,
-     },
-     letterSpacing: {
-       tight: '-0.02em',
-       normal: '0em',
-       wide: '0.02em',
-     },
-   };
+```typescript
+export const themeConfig = {
+  defaultColorScheme: 'sunset',    // Choose from available color schemes
+  defaultFontScheme: 'modern',     // Choose from available font schemes
+  defaultDarkMode: false,          // Set dark mode as default
+  persistTheme: true,              // Save preferences to localStorage
+};
+```
 
-   // Add to fontSchemes object
-   export const fontSchemes = {
-     // ... existing schemes
-     custom: myCustomScheme,
-   } as const;
-   ```
+### Runtime Theme Changes
+
+Use the theme hooks in your components:
+
+```typescript
+import { useTheme } from '../contexts/ThemeContext';
+
+const MyComponent = () => {
+  const { setColorScheme, setFontScheme, toggleDarkMode } = useTheme();
+
+  // Change color scheme
+  const handleColorChange = () => {
+    setColorScheme('sunset');
+  };
+
+  // Change font scheme
+  const handleFontChange = () => {
+    setFontScheme('classic');
+  };
+
+  // Toggle dark mode
+  const handleDarkMode = () => {
+    toggleDarkMode();
+  };
+};
+``` 

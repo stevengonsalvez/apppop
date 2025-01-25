@@ -43,5 +43,5 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- Add age verification constraint
-alter table profiles add constraint age_verification 
-  check (date_of_birth <= current_date - interval '18 years');
+-- alter table profiles add constraint age_verification 
+--   check (date_of_birth <= current_date - interval '18 years');

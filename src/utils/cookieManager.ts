@@ -1,3 +1,5 @@
+import { clarityManager } from './clarityManager';
+
 export type ConsentCategory = {
   id: string;
   name: string;
@@ -10,25 +12,25 @@ export type ConsentCategory = {
 export const CONSENT_CATEGORIES: ConsentCategory[] = [
   {
     id: 'necessary',
-    name: 'Required',
+    name: 'Necessary',
     description: 'Essential cookies for website functionality',
-    detailedDescription: 'Essential cookies for core website functions and services.',
+    detailedDescription: 'These cookies are required for the website to function properly. They cannot be disabled.',
     required: true,
     cookies: ['session', 'csrf']
   },
   {
     id: 'analytics',
     name: 'Analytics',
-    description: 'Cookies for website analytics and improvement',
-    detailedDescription: 'Help us understand how visitors interact with our website.',
+    description: 'Cookies for website analytics and performance',
+    detailedDescription: 'These cookies help us understand how visitors interact with our website, helping us improve our services. This includes Microsoft Clarity for user behavior analytics.',
     required: false,
     cookies: ['_clarity']
   },
   {
     id: 'marketing',
     name: 'Marketing',
-    description: 'Cookies for marketing and personalization',
-    detailedDescription: 'Enable personalized content and marketing features.',
+    description: 'Marketing and advertising cookies',
+    detailedDescription: 'These cookies are used to track visitors across websites to display relevant advertisements.',
     required: false,
     cookies: []
   }

@@ -1,13 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import CookieConsent from 'react-cookie-consent';
 import { cookieManager, CONSENT_CATEGORIES } from '../utils/cookieManager';
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList, IonItem, IonLabel, IonToggle, IonText } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
+  Typography,
+  Switch,
+  Paper,
+  Snackbar,
+  Alert,
+  Stack,
+  Slide,
+} from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
 
 interface PreferencesModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onClose }) => {
   const [tempConsents, setTempConsents] = useState(cookieManager.getConsents());
@@ -26,40 +49,66 @@ const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onClose }) 
   };
 
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Cookie Preferences</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding">
-        <div className="space-y-6">
+    <Dialog 
+      open={isOpen} 
+      onClose={onClose}
+      TransitionComponent={Transition}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        <Typography component="div" variant="h5" fontWeight="bold">
+          Cookie Preferences
+        </Typography>
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
           {CONSENT_CATEGORIES.map(category => (
-            <div key={category.id} className="bg-gray-800 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-white">{category.name}</h3>
+            <Paper 
+              key={category.id} 
+              elevation={0}
+              sx={{ 
+                p: 2, 
+                bgcolor: 'background.default',
+                borderRadius: 2
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle1" fontWeight="medium">
+                  {category.name}
+                </Typography>
                 {!category.required && (
-                  <IonToggle
+                  <Switch
                     checked={tempConsents[category.id]}
-                    onIonChange={e => setTempConsents(prev => ({
+                    onChange={e => setTempConsents(prev => ({
                       ...prev,
-                      [category.id]: e.detail.checked
+                      [category.id]: e.target.checked
                     }))}
+                    color="primary"
                   />
                 )}
-              </div>
-              <p className="text-sm text-gray-300">{category.detailedDescription}</p>
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {category.detailedDescription}
+              </Typography>
               {category.required && (
-                <p className="text-xs text-gray-400 mt-2">Required for website functionality</p>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  Required for website functionality
+                </Typography>
               )}
-            </div>
+            </Paper>
           ))}
-        </div>
-        <IonButton expand="block" onClick={handleSave} className="mt-6">
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ p: 3 }}>
+        <Button onClick={onClose} variant="outlined" size="large">
+          Cancel
+        </Button>
+        <Button onClick={handleSave} variant="contained" size="large">
           Save Preferences
-        </IonButton>
-      </IonContent>
-    </IonModal>
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
@@ -87,48 +136,70 @@ export const CookieConsentBanner: React.FC = () => {
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
+  const handleOpenPreferences = () => {
+    setShowPreferences(true);
+    setShowBanner(false); // Hide the banner when preferences dialog is open
+  };
+
+  if (!showBanner && !showPreferences) return null;
 
   return (
     <>
-      <CookieConsent
-        location="bottom"
-        buttonText="Accept All"
-        declineButtonText="Reject All"
-        enableDeclineButton
-        onAccept={handleAcceptAll}
-        onDecline={handleDeclineAll}
-        style={{ 
-          background: '#2B373B',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '20px'
-        }}
-        buttonStyle={{ 
-          background: '#10B981', 
-          color: 'white', 
-          fontSize: '13px',
-          borderRadius: '4px',
-          padding: '10px 20px'
-        }}
-        declineButtonStyle={{ 
-          background: '#000000', 
-          color: 'white',
-          fontSize: '13px',
-          borderRadius: '4px',
-          padding: '10px 20px'
+      <Snackbar
+        open={showBanner}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{
+          '& .MuiPaper-root': {
+            maxWidth: 'md',
+            width: '100%',
+            m: 2,
+          },
         }}
       >
-        <div className="space-y-2">
-          <p>This website uses cookies to enhance your experience.</p>
-          <button
-            onClick={() => setShowPreferences(true)}
-            className="text-emerald-500 underline cursor-pointer"
-          >
-            Manage Preferences
-          </button>
-        </div>
-      </CookieConsent>
+        <Paper
+          elevation={6}
+          sx={{
+            p: 3,
+            bgcolor: 'background.paper',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 2,
+            width: '100%',
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="body1" gutterBottom>
+              This website uses cookies to enhance your experience.
+            </Typography>
+            <Button
+              onClick={handleOpenPreferences}
+              color="primary"
+              sx={{ textDecoration: 'underline', p: 0, minWidth: 'auto' }}
+            >
+              Manage Preferences
+            </Button>
+          </Box>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ minWidth: { sm: '300px' } }}>
+            <Button
+              variant="outlined"
+              onClick={handleDeclineAll}
+              fullWidth
+              size="large"
+            >
+              Reject All
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleAcceptAll}
+              fullWidth
+              size="large"
+            >
+              Accept All
+            </Button>
+          </Stack>
+        </Paper>
+      </Snackbar>
 
       <PreferencesModal 
         isOpen={showPreferences}

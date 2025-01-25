@@ -1,14 +1,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import { UserProvider } from '../contexts/UserContext';
-import { IonApp, IonContent } from '@ionic/react';
+import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+import { theme } from '../theme/theme';
 
 export function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0
+        gcTime: 0
       },
     },
   });
@@ -16,11 +17,12 @@ export function renderWithProviders(ui: React.ReactElement) {
   return render(
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <IonApp>
-          <IonContent>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
             {ui}
-          </IonContent>
-        </IonApp>
+          </Box>
+        </ThemeProvider>
       </UserProvider>
     </QueryClientProvider>
   );
