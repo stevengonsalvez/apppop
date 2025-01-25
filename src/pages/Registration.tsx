@@ -1,6 +1,31 @@
-import { IonContent, IonPage, useIonToast } from '@ionic/react';
 import { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { Link } from 'react-router-dom';
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Container,
+  Paper,
+  Stepper,
+  Step,
+  StepLabel,
+  Checkbox,
+  FormControlLabel,
+  InputAdornment,
+  IconButton,
+  Alert,
+  Snackbar,
+} from '@mui/material';
+import {
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Person as PersonIcon,
+  Cake as CakeIcon,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
 
 interface RegistrationState {
   step: number;
@@ -22,38 +47,48 @@ const initialState: RegistrationState = {
 
 export const RegistrationPage: React.FC = () => {
   const [state, setState] = useState<RegistrationState>(initialState);
-  const [showToast] = useIonToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
 
-  const updateField = (field: keyof RegistrationState, value: any) => {
-    setState(prev => ({ ...prev, [field]: value }));
+  const steps = ['Account', 'Personal Info', 'Preferences'];
+
+  const handleNext = () => {
+    setState(prev => ({ ...prev, step: prev.step + 1 }));
+  };
+
+  const handleBack = () => {
+    setState(prev => ({ ...prev, step: prev.step - 1 }));
   };
 
   const handleSubmit = async () => {
     try {
       const { user, error: signUpError } = await supabase.auth.signUp({
         email: state.email,
-        password: state.password
-      }, {
-        data: {
-          full_name: state.fullName,
-          date_of_birth: state.dateOfBirth,
-          marketing_consent: state.marketingConsent
-        }
+        password: state.password,
       });
 
       if (signUpError) throw signUpError;
 
-      await showToast({
-        message: 'Registration successful! Please check your email to verify your account.',
-        duration: 5000,
-        color: 'success'
-      });
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: state.fullName,
+          date_of_birth: state.dateOfBirth,
+          marketing_email: state.marketingConsent,
+          marketing_notifications: state.marketingConsent,
+        })
+        .eq('id', user?.id);
 
+      if (profileError) throw profileError;
+
+      setToast({
+        message: 'Registration successful! Please check your email to verify your account.',
+        open: true
+      });
     } catch (error: any) {
-      await showToast({
+      setToast({
         message: error.message,
-        duration: 3000,
-        color: 'danger'
+        open: true
       });
     }
   };
@@ -62,144 +97,189 @@ export const RegistrationPage: React.FC = () => {
     switch (state.step) {
       case 1:
         return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Create Account</h2>
-              <p className="text-sm text-gray-400">Enter your email and create a password</p>
-            </div>
-
-            <div className="space-y-4">
-              <input
-                type="email"
-                value={state.email}
-                onChange={e => updateField('email', e.target.value)}
-                placeholder="Email address"
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
-              />
-              <input
-                type="password"
-                value={state.password}
-                onChange={e => updateField('password', e.target.value)}
-                placeholder="Password"
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
-              />
-            </div>
-
-            <button
-              onClick={() => updateField('step', 2)}
-              className="w-full bg-emerald-600 text-white p-3 rounded-lg"
+          <Box>
+            <Typography variant="h5" gutterBottom>
+              Create your account
+            </Typography>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Email"
+              value={state.email}
+              onChange={e => setState(prev => ({ ...prev, email: e.target.value }))}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={state.password}
+              onChange={e => setState(prev => ({ ...prev, password: e.target.value }))}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleNext}
+              sx={{ mt: 3 }}
+              disabled={!state.email || !state.password}
             >
-              Continue
-            </button>
-          </div>
+              Next
+            </Button>
+          </Box>
         );
-
       case 2:
         return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Personal Details</h2>
-              <p className="text-sm text-gray-400">Tell us about yourself</p>
-            </div>
-
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={state.fullName}
-                onChange={e => updateField('fullName', e.target.value)}
-                placeholder="Full name"
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
-              />
-              <input
-                type="date"
-                value={state.dateOfBirth}
-                onChange={e => updateField('dateOfBirth', e.target.value)}
-                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
-              />
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => updateField('step', 1)}
-                className="flex-1 border border-gray-700 text-white p-3 rounded-lg"
-              >
+          <Box>
+            <Typography variant="h5" gutterBottom>
+              Personal Information
+            </Typography>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Full Name"
+              value={state.fullName}
+              onChange={e => setState(prev => ({ ...prev, fullName: e.target.value }))}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Date of Birth"
+              type="date"
+              value={state.dateOfBirth}
+              onChange={e => setState(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CakeIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+              <Button onClick={handleBack}>
                 Back
-              </button>
-              <button
-                onClick={() => updateField('step', 3)}
-                className="flex-1 bg-emerald-600 text-white p-3 rounded-lg"
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                disabled={!state.fullName || !state.dateOfBirth}
               >
-                Continue
-              </button>
-            </div>
-          </div>
+                Next
+              </Button>
+            </Box>
+          </Box>
         );
-
       case 3:
         return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Almost Done!</h2>
-              <p className="text-sm text-gray-400">Review and complete registration</p>
-            </div>
-
-            <div className="space-y-4">
-              <label className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
+          <Box>
+            <Typography variant="h5" gutterBottom>
+              Marketing Preferences
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
                   checked={state.marketingConsent}
-                  onChange={e => updateField('marketingConsent', e.target.checked)}
-                  className="form-checkbox h-5 w-5 text-emerald-600"
+                  onChange={e => setState(prev => ({ ...prev, marketingConsent: e.target.checked }))}
                 />
-                <span className="text-white text-sm">
-                  I agree to receive marketing communications
-                </span>
-              </label>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => updateField('step', 2)}
-                className="flex-1 border border-gray-700 text-white p-3 rounded-lg"
-              >
+              }
+              label="I agree to receive marketing communications"
+            />
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
+              <Button onClick={handleBack}>
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="contained"
                 onClick={handleSubmit}
-                className="flex-1 bg-emerald-600 text-white p-3 rounded-lg"
               >
                 Complete Registration
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Box>
+          </Box>
         );
+      default:
+        return null;
     }
   };
 
   return (
-    <IonPage>
-      <IonContent className="ion-padding">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="max-w-md w-full space-y-8 p-4">
-            <div className="relative mb-8">
-              <div className="flex justify-between mb-2">
-                {[1, 2, 3].map((step) => (
-                  <div
-                    key={step}
-                    className={`w-1/3 h-1 rounded ${
-                      step <= state.step ? 'bg-emerald-500' : 'bg-gray-700'
-                    }`}
-                  />
-                ))}
-              </div>
-              <div className="text-center text-sm text-gray-500">
-                Step {state.step} of 3
-              </div>
-            </div>
+    <Box sx={{ 
+      minHeight: '100vh',
+      bgcolor: 'background.default',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      p: 2
+    }}>
+      <Container component="main" maxWidth="xs">
+        <Box>
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+            <Stepper activeStep={state.step - 1} alternativeLabel sx={{ mb: 4 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
             {renderStep()}
-          </div>
-        </div>
-      </IonContent>
-    </IonPage>
+            
+            {state.step === 1 && (
+              <Box sx={{ mt: 3, textAlign: 'center' }}>
+                <Link to="/login" style={{ textDecoration: 'none' }}>
+                  <Typography color="primary" variant="body2">
+                    Already have an account? Sign in
+                  </Typography>
+                </Link>
+              </Box>
+            )}
+          </Paper>
+        </Box>
+      </Container>
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={6000}
+        onClose={() => setToast(prev => ({ ...prev, open: false }))}
+      >
+        <Alert 
+          severity={toast.message.includes('successful') ? 'success' : 'error'}
+          onClose={() => setToast(prev => ({ ...prev, open: false }))}
+        >
+          {toast.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
