@@ -99,7 +99,11 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
           '& .MuiDrawer-paper': { 
             boxSizing: 'border-box', 
             width: drawerWidth,
-            bgcolor: 'background.paper',
+            bgcolor: 'tertiary.main',
+            color: 'tertiary.contrastText',
+            '& .MuiListItemIcon-root': {
+              color: 'tertiary.contrastText'
+            }
           },
         }}
       >
@@ -113,7 +117,11 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
           '& .MuiDrawer-paper': { 
             boxSizing: 'border-box', 
             width: drawerWidth,
-            bgcolor: 'background.paper',
+            bgcolor: 'tertiary.main',
+            color: 'tertiary.contrastText',
+            '& .MuiListItemIcon-root': {
+              color: 'tertiary.contrastText'
+            }
           },
         }}
         open
