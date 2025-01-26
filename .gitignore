@@ -55,3 +55,6 @@ yarn-error.log*
 
 # Android
 /android
+
+# Sentry Config File
+.env.sentry-build-plugin

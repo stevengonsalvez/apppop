@@ -10,6 +10,7 @@ import {
   Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
+import { SentryTest } from '../components/SentryTest';
 
 const MotionBox = motion(Box);
 const MotionChip = motion(Chip);
@@ -172,11 +173,11 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
     >
       <Box sx={{ position: 'relative', zIndex: 2, p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Box>
-          <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: alpha(theme.palette.background.paper, 0.8), px: 1, py: 0.5, borderRadius: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: alpha(theme.palette.background.paper, 0.8), px: 1, py: 0.5, borderRadius: 1, fontSize: '0.7rem' }}>
             {feature.type}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)', fontSize: '1.4rem' }}>
               {feature.title}
             </Typography>
             {feature.users && (
@@ -198,7 +199,8 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
               px: 1.5,
               py: 0.5,
               borderRadius: 2,
-              backdropFilter: 'blur(4px)'
+              backdropFilter: 'blur(4px)',
+              fontSize: '0.7rem'
             }}
           >
             {feature.level}
@@ -217,7 +219,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
                 backdropFilter: 'blur(4px)'
               }}
             >
-              <Typography sx={{ color: 'white', fontWeight: 'bold' }}>
+              <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>
                 {feature.progress}%
               </Typography>
             </Box>
@@ -250,7 +252,7 @@ export const HomePage: React.FC = () => {
               variant="h2" 
               sx={{ 
                 fontWeight: 900,
-                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+                fontSize: { xs: '1.75rem', sm: '2.45rem', md: '2.8rem' },
                 lineHeight: 1.2,
                 mb: 2,
                 letterSpacing: '-0.02em',
@@ -265,7 +267,7 @@ export const HomePage: React.FC = () => {
               variant="h2" 
               sx={{ 
                 fontWeight: 900,
-                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4rem' },
+                fontSize: { xs: '1.75rem', sm: '2.45rem', md: '2.8rem' },
                 lineHeight: 1.2,
                 letterSpacing: '-0.02em',
                 color: 'text.primary'
@@ -297,6 +299,12 @@ export const HomePage: React.FC = () => {
             whileTap={{ scale: 0.95 }}
           >
             <SettingsIcon />
+          </MotionBox>
+          <MotionBox
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <SentryTest />
           </MotionBox>
         </Box>
       </Box>
