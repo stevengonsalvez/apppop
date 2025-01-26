@@ -23,6 +23,7 @@ import { theme } from './theme/theme';
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProvider } from './contexts/UserContext';
+import { useTheme } from './contexts/ThemeContext';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { cookieManager } from './utils/cookieManager';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -30,6 +31,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { supabase } from './utils/supabaseClient';
 import { LeftDrawer } from './components/LeftDrawer';
 import { BottomNav } from './components/BottomNav';
+import { InteractiveLogo } from './components/InteractiveLogo';
 
 import './theme/variables.css';
 
@@ -42,6 +44,7 @@ import TimelinePage from './pages/Timeline';
 import { ThemeProvider as NewThemeProvider } from './contexts/ThemeContext';
 import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
+import StoriesPage from './pages/Stories';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -77,6 +80,7 @@ const AuthenticatedApp: React.FC = () => {
   const history = useHistory();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bottomNavValue, setBottomNavValue] = useState(0);
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -116,18 +120,9 @@ const AuthenticatedApp: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Box 
-            component="img"
-            src="/logo.png"
-            alt="App Logo"
-            sx={{ 
-              height: { xs: 45, sm: 45 },
-              width: 'auto',
-              objectFit: 'contain',
-              ml: 'auto',
-              borderRadius: 2,
-              display: 'block',
-            }}
+          <InteractiveLogo 
+            onThemeToggle={toggleDarkMode}
+            isDarkMode={isDarkMode}
           />
         </Toolbar>
       </AppBar>
@@ -160,6 +155,7 @@ const AuthenticatedApp: React.FC = () => {
         <Route exact path="/profile" component={ProfilePage} />
         <Route exact path="/plans" component={PlansPage} />
         <Route exact path="/timeline" component={TimelinePage} />
+        <Route exact path="/stories" component={StoriesPage} />
         <Route 
           exact 
           path="/checkout" 
