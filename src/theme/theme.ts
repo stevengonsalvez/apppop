@@ -1,6 +1,7 @@
 import { createTheme, Theme, alpha } from '@mui/material';
 import { ColorScheme, colorSchemes, createPaletteFromScheme } from './colorScheme';
 import { FontScheme, fontSchemes } from './fontScheme';
+import { appPopColorScheme } from './colorScheme';
 
 // Add tertiary to allowed button colors
 declare module '@mui/material/Button' {
@@ -16,7 +17,7 @@ interface ThemeOptions {
 }
 
 export const createAppTheme = ({ 
-  colorScheme = colorSchemes.default, 
+  colorScheme = appPopColorScheme, 
   fontScheme = fontSchemes.modern,
   isDarkMode = false 
 }: ThemeOptions = {}): Theme => {
