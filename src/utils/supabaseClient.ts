@@ -95,7 +95,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'x-client-info': 'ionic-template',
+      'x-client-info': 'apppop',
     },
     fetch: (url, options) => {
       const endpoint = new URL(url).pathname;

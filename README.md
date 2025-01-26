@@ -1,4 +1,4 @@
-# Ionic Template App
+# AppPop
 
 A modern React template with Material UI components, Supabase authentication, and TypeScript.
 
@@ -40,7 +40,7 @@ Detailed documentation is available in the `docs` folder:
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ionic-template
+cd apppop
 
 # Install dependencies
 npm install
