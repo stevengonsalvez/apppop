@@ -75,6 +75,7 @@
     "@vitejs/plugin-legacy": "^5.0.0",
     "@vitejs/plugin-react": "^4.0.1",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "cypress": "^13.5.0",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
