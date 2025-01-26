@@ -9,8 +9,8 @@ interface ThemeConfig {
 }
 
 export const themeConfig: ThemeConfig = {
-  defaultColorScheme: 'tropicalBreeze',
+  defaultColorScheme: 'appPop',
   defaultFontScheme: 'vibrantSans',
-  defaultDarkMode: false, // Set to true to default to dark mode
-  persistTheme: true, // Set to true to save theme preferences in localStorage
+  defaultDarkMode: false,
+  persistTheme: false,
 }; 

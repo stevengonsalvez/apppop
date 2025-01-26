@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { useHistory } from 'react-router-dom';
 import { CookieConsentBanner } from '../components/CookieConsentBanner';
 
@@ -11,56 +11,42 @@ export const LandingPage: React.FC = () => {
         height: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: 'background.default',
         position: 'relative',
+        backgroundImage: 'url("/splash.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          zIndex: 1,
+        },
       }}
     >
-      {/* Branding Section */}
       <Box
         sx={{
           flex: 1,
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'flex-end',
+          position: 'relative',
+          zIndex: 2,
           p: 3,
-          textAlign: 'center',
+          pb: 4,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 70%)',
         }}
       >
-        {/* Hero Image */}
-        <Box
-          sx={{
+        <Stack 
+          spacing={2} 
+          sx={{ 
             width: '100%',
-            height: '60%',
-            maxHeight: '400px',
-            mb: 4,
-            backgroundImage: 'url("/path-to-your-image.jpg")', // Replace with your image
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            maxWidth: '400px',
+            mx: 'auto',
           }}
-        />
-
-        {/* Branding Text */}
-        <Typography variant="h3" component="h1" gutterBottom fontWeight="bold">
-          Welcome to Template
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px', mb: 4 }}>
-          Your modern, secure, and feature-rich application template
-        </Typography>
-      </Box>
-
-      {/* Action Buttons */}
-      <Box
-        sx={{
-          p: 3,
-          width: '100%',
-          maxWidth: '400px',
-          mx: 'auto',
-          mb: 4,
-        }}
-      >
-        <Stack spacing={2}>
+        >
           <Button
             variant="contained"
             size="large"
@@ -71,7 +57,9 @@ export const LandingPage: React.FC = () => {
               bgcolor: 'primary.main',
               '&:hover': {
                 bgcolor: 'primary.dark',
+                transform: 'translateY(-2px)',
               },
+              transition: 'transform 0.2s',
             }}
           >
             Sign In
@@ -83,12 +71,16 @@ export const LandingPage: React.FC = () => {
             onClick={() => history.push('/register')}
             sx={{
               height: 48,
-              borderColor: 'primary.main',
-              color: 'primary.main',
+              borderColor: 'common.white',
+              color: 'common.white',
+              borderWidth: 2,
+              backdropFilter: 'blur(4px)',
               '&:hover': {
-                borderColor: 'primary.dark',
-                bgcolor: 'transparent',
+                borderColor: 'common.white',
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                transform: 'translateY(-2px)',
               },
+              transition: 'transform 0.2s',
             }}
           >
             Sign Up

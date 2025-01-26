@@ -1,4 +1,4 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
 import { BrowserRouter as Router, useHistory } from 'react-router-dom';
 import { 
   ThemeProvider, 
@@ -37,7 +37,11 @@ import { LoginPage } from './pages/Login';
 import { RegistrationPage } from './pages/Registration';
 import ProfilePage from './pages/Profile';
 import { LandingPage } from './pages/Landing';
+import PlansPage from './pages/Plans';
+import TimelinePage from './pages/Timeline';
 import { ThemeProvider as NewThemeProvider } from './contexts/ThemeContext';
+import CheckoutPage from './pages/Checkout';
+import { Plan, Addon } from './types/plan';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,125 +61,99 @@ const mainNavItems = [
   { text: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
 ];
 
+interface CheckoutLocationState {
+  selectedPlan: Plan;
+  selectedAddons: Addon[];
+}
+
+const CheckoutRoute: React.FC<RouteComponentProps<{}, {}, CheckoutLocationState>> = (props) => (
+  <CheckoutPage 
+    selectedPlan={props.location.state?.selectedPlan}
+    selectedAddons={props.location.state?.selectedAddons || []}
+  />
+);
+
 const AuthenticatedApp: React.FC = () => {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [bottomNavValue, setBottomNavValue] = useState(0);
   const history = useHistory();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [bottomNavValue, setBottomNavValue] = useState(0);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const handleSignOut = async () => {
-    cookieManager.clearAllConsents();
     await supabase.auth.signOut();
   };
 
   const handleNavigation = (path: string) => {
     history.push(path);
-    setDrawerOpen(false);
+    setMobileOpen(false);
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'background.paper',
-          borderBottom: 1,
-          borderColor: 'divider',
         }}
       >
         <Toolbar>
           <IconButton
-            color="primary"
+            color="inherit"
             edge="start"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            sx={{ 
-              mr: 2, 
-              display: { sm: 'none' },
-              '& .MuiSvgIcon-root': {
-                color: 'text.primary',
-              }
-            }}
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" color="text.primary">
-            Template App
+          <Typography variant="h6" noWrap component="div">
+            App Name
           </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton sx={{ color: 'text.primary' }}>
-            <NotificationsIcon />
-          </IconButton>
-          <IconButton sx={{ color: 'text.primary' }}>
-            <SearchIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
-
       <LeftDrawer
         drawerWidth={drawerWidth}
-        mobileOpen={drawerOpen}
-        onDrawerToggle={() => setDrawerOpen(!drawerOpen)}
+        mobileOpen={mobileOpen}
+        onDrawerToggle={handleDrawerToggle}
         onNavigate={handleNavigation}
         onSignOut={handleSignOut}
       />
-
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          mt: '64px',
-          mb: '56px',
+          mt: ['56px', '64px'],
+          mb: ['56px', 0],
         }}
       >
         <Route exact path="/home">
-          <Box sx={{ p: 2 }}>
+          <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
-              Welcome to the Template App
+              Welcome Back
             </Typography>
-            <Typography variant="body1" color="text.secondary" gutterBottom>
-              This is your starting point. Customize this page as needed.
+            <Typography variant="body1" color="text.secondary">
+              Your personalized dashboard and recent activities
             </Typography>
-            
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-              {mainNavItems.map((item) => (
-                <Grid item xs={12} sm={6} md={3} key={item.text}>
-                  <Card 
-                    sx={{ 
-                      cursor: 'pointer',
-                      '&:hover': { transform: 'translateY(-4px)', transition: 'transform 0.2s' }
-                    }}
-                    onClick={() => handleNavigation(item.path)}
-                  >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        {item.icon}
-                        <Typography variant="h6" sx={{ ml: 1 }}>
-                          {item.text}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Access your {item.text.toLowerCase()} section
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
           </Box>
         </Route>
-        <Route exact path="/profile">
-          <ProfilePage />
-        </Route>
+        <Route exact path="/profile" component={ProfilePage} />
+        <Route exact path="/plans" component={PlansPage} />
+        <Route exact path="/timeline" component={TimelinePage} />
+        <Route 
+          exact 
+          path="/checkout" 
+          component={CheckoutRoute}
+        />
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
       </Box>
-
-      <BottomNav
+      <BottomNav 
         value={bottomNavValue}
         onChange={setBottomNavValue}
         onNavigate={handleNavigation}

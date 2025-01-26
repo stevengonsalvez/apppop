@@ -18,6 +18,8 @@ import {
   Dashboard as DashboardIcon,
   Notifications as NotificationsIcon,
   Search as SearchIcon,
+  CreditCard as CreditCardIcon,
+  Timeline as TimelineIcon,
 } from '@mui/icons-material';
 
 interface LeftDrawerProps {
@@ -38,6 +40,8 @@ const mainNavItems = [
 const bottomNavItems = [
   { text: 'Support', icon: <HelpIcon />, path: '/support' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { text: 'Plans', icon: <CreditCardIcon />, path: '/plans' },
+  { text: 'Timeline', icon: <TimelineIcon />, path: '/timeline' },
   { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
 ];
 

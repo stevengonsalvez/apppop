@@ -1029,6 +1029,112 @@ export const tropicalBreezeScheme: ColorScheme = {
   },
 };
 
+export const appPopColorScheme: ColorScheme = {
+  name: 'appPop',
+  light: {
+    primary: {
+      main: '#F15BB5', // Vibrant pink
+      light: '#FF85C0',
+      dark: '#C5118E', // Dark pink
+      contrastText: '#1B1B1B',
+    },
+    secondary: {
+      main: '#00BBF9', // Electric blue
+      light: '#66D6FF', // Light blue
+      dark: '#0089C6', // Dark blue
+      contrastText: '#1B1B1B',
+    },
+    tertiary: {
+      main: '#FFCC00', // Bold yellow
+      light: '#FFDD4F', // Light yellow
+      dark: '#C79D00', // Dark yellow
+      contrastText: '#1B1B1B',
+    },
+    background: {
+      default: '#00CFFD', // Vibrant aqua
+      paper: '#FFD166',   // Playful orange
+      surface: '#FF65A3', // Bold pink-magenta
+      surfaceVariant: '#FFA500', // Vibrant orange for added fun
+    },
+    text: {
+      primary: '#1B1B1B', // Dark gray
+      secondary: '#3E3E3E', // Dark gray
+      disabled: '#A8A8A8', // Light gray
+    },
+    error: {
+      main: '#FF4B3E', // Bold red
+      light: '#FF7A71', // Light red
+      dark: '#D42E22', // Dark red
+    },
+    warning: {
+      main: '#FF9000', // Bright orange
+      light: '#FFB04D', // Light orange
+      dark: '#CC7300',
+    },
+    info: {
+      main: '#007BFF', // Electric blue
+      light: '#66BFFF', // Light blue
+      dark: '#0056A4', // Dark blue
+    },
+    success: {
+      main: '#00E676', // Bright green
+      light: '#66F599', // Light green
+      dark: '#00B159', // Dark green
+    },
+  },
+  dark: {
+    primary: {
+      main: '#FF85C0', // Light pink
+      light: '#FFADD5', // Light pink
+      dark: '#F15BB5', // Dark pink
+      contrastText: '#1B1B1B',
+    },
+    secondary: {
+      main: '#66D6FF', // Vibrant blue
+      light: '#99E5FF', // Light blue
+      dark: '#00BBF9', // Dark blue
+      contrastText: '#1B1B1B', // Dark gray
+    },
+    tertiary: {
+      main: '#FFDD4F', // Bright yellow
+      light: '#FFE785', // Light yellow
+      dark: '#FFCC00',
+      contrastText: '#1B1B1B',
+    },
+    background: {
+      default: '#1E293B', // Deep navy with vibrancy
+      paper: '#4B5563',   // Mid-tone charcoal gray
+      surface: '#8B5CF6', // Vivid violet for a daring touch
+      surfaceVariant: '#D97706', // Bold amber-orange
+    },
+    text: {
+      primary: '#F7F0E8', // Light gray
+      secondary: '#D4C9BE', // Light gray
+      disabled: '#8C847B', // Light gray
+    },
+    error: {
+      main: '#FF7A71', // Bold red
+      light: '#FFA199',
+      dark: '#FF4B3E',
+    },
+    warning: {
+      main: '#FFA500', // Bright orange
+      light: '#FFC785', // Light orange
+      dark: '#FF9000',
+    },
+    info: {
+      main: '#66BFFF', // Vibrant sky blue
+      light: '#85E0FF', // Light blue
+      dark: '#007BFF',
+    },
+    success: {
+      main: '#00E676', // Electric green
+      light: '#66F599', // Light green
+      dark: '#00B159',
+    },
+  },
+};
+
 export const colorSchemes = {
   default: defaultColorScheme,
   indigo: indigoColorScheme,
@@ -1039,6 +1145,7 @@ export const colorSchemes = {
   mint: mintColorScheme,
   aurora: auroraScheme,
   tropicalBreeze: tropicalBreezeScheme,
+  appPop: appPopColorScheme,
 } as const;
 
 export type ColorSchemeName = keyof typeof colorSchemes;
