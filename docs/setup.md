@@ -5,7 +5,7 @@
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ionic-template
+cd apppop
 
 # Install dependencies
 npm install
