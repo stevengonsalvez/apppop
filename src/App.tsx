@@ -45,6 +45,7 @@ import { ThemeProvider as NewThemeProvider } from './contexts/ThemeContext';
 import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
+import { HomePage } from './pages/Home';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -142,16 +143,7 @@ const AuthenticatedApp: React.FC = () => {
           mb: ['56px', 0],
         }}
       >
-        <Route exact path="/home">
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-              Welcome Back
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Your personalized dashboard and recent activities
-            </Typography>
-          </Box>
-        </Route>
+        <Route exact path="/home" component={HomePage} />
         <Route exact path="/profile" component={ProfilePage} />
         <Route exact path="/plans" component={PlansPage} />
         <Route exact path="/timeline" component={TimelinePage} />
