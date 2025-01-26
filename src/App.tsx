@@ -101,7 +101,13 @@ const AuthenticatedApp: React.FC = () => {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar>
+        <Toolbar 
+          sx={{ 
+            justifyContent: 'space-between', 
+            minHeight: { xs: 70, sm: 70 },
+            px: { xs: 2, sm: 3 },
+          }}
+        >
           <IconButton
             color="inherit"
             edge="start"
@@ -110,9 +116,19 @@ const AuthenticatedApp: React.FC = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            App Name
-          </Typography>
+          <Box 
+            component="img"
+            src="/logo.png"
+            alt="App Logo"
+            sx={{ 
+              height: { xs: 45, sm: 45 },
+              width: 'auto',
+              objectFit: 'contain',
+              ml: 'auto',
+              borderRadius: 2,
+              display: 'block',
+            }}
+          />
         </Toolbar>
       </AppBar>
       <LeftDrawer

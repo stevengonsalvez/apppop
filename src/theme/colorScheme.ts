@@ -1033,10 +1033,10 @@ export const appPopColorScheme: ColorScheme = {
   name: 'appPop',
   light: {
     primary: {
-      main: '#F15BB5', // Vibrant pink
-      light: '#FF85C0',
-      dark: '#C5118E', // Dark pink
-      contrastText: '#1B1B1B',
+      main: '#FFCC00', // Vibrant yellow
+      light: '#FFEB66', // Light yellow
+      dark: '#C79D00', // Dark yellow
+      contrastText: '#1B1B1B', // Dark gray
     },
     secondary: {
       main: '#00BBF9', // Electric blue
@@ -1052,7 +1052,7 @@ export const appPopColorScheme: ColorScheme = {
     },
     background: {
       default: '#00CFFD', // Vibrant aqua
-      paper: '#FFD166',   // Playful orange
+      paper: '#0077B6', 
       surface: '#FF65A3', // Bold pink-magenta
       surfaceVariant: '#FFA500', // Vibrant orange for added fun
     },

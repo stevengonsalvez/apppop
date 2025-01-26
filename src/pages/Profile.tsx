@@ -108,13 +108,13 @@ const ProfileCard = styled(Card)(({ theme }) => ({
 }));
 
 const ProfileAvatar = styled(Avatar)(({ theme }) => ({
-  width: 120,
-  height: 120,
+  width: 100,
+  height: 100,
   border: `4px solid ${theme.palette.background.paper}`,
   boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
   backgroundColor: theme.palette.primary.main,
   position: 'absolute',
-  top: -60,
+  top: -50,
   left: '50%',
   transform: 'translateX(-50%)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -230,13 +230,13 @@ const ProfilePage: React.FC = () => {
               justifyContent="center"
               sx={{ width: '100%', height: '100%', position: 'relative' }}
             >
-              <PersonIcon sx={{ fontSize: 60 }} />
+              <PersonIcon sx={{ fontSize: 48, color: 'inherit' }} />
               <Tooltip title="Change Photo" arrow>
                 <IconButton
                   sx={{
                     position: 'absolute',
-                    bottom: -8,
-                    right: -8,
+                    bottom: -6,
+                    right: -6,
                     backgroundColor: 'background.paper',
                     boxShadow: theme => `0 4px 12px ${alpha(theme.palette.primary.main, 0.1)}`,
                     '&:hover': {
@@ -429,7 +429,7 @@ const ProfilePage: React.FC = () => {
 
           <Box sx={{ mt: 6 }}>
             <Button
-              variant="outlined"
+              variant="contained"
               color="error"
               startIcon={<LogoutIcon />}
               onClick={handleSignOut}
@@ -438,11 +438,9 @@ const ProfilePage: React.FC = () => {
               sx={{
                 borderRadius: 3,
                 py: 1.5,
-                borderWidth: 2,
                 '&:hover': {
-                  borderWidth: 2,
                   transform: 'translateY(-2px)',
-                  boxShadow: theme => `0 8px 24px ${alpha(theme.palette.error.main, 0.15)}`,
+                  boxShadow: theme => `0 8px 24px ${alpha(theme.palette.error.main, 0.25)}`,
                 },
               }}
             >
