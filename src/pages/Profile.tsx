@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import { supabase } from '../utils/supabaseClient';
 import { cookieManager } from '../utils/cookieManager';
+import { trackProfileUpdate } from '../utils/activity';
 import {
   AppBar,
   Toolbar,
@@ -151,6 +152,17 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
+interface UserProfile {
+  id?: string;
+  full_name: string;
+  date_of_birth: string | null;
+  marketing_email: boolean;
+  marketing_notifications: boolean;
+  avatar_url?: string;
+  email?: string;
+  updated_at?: string;
+}
+
 const ProfilePage: React.FC = () => {
   const { profile, user, updateUserInContext } = useUserContext();
   const history = useHistory();
@@ -181,34 +193,37 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!user?.id) return;
+    if (!user) return;
     setIsSaving(true);
-    setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: editedProfile.full_name,
-          date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
-          marketing_email: editedProfile.marketing_email,
-          marketing_notifications: editedProfile.marketing_notifications,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id)
-        .select()
-        .single();
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        full_name: editedProfile.full_name,
+        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+        marketing_email: editedProfile.marketing_email,
+        marketing_notifications: editedProfile.marketing_notifications,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) throw error;
 
+      // Track profile update
+      await trackProfileUpdate({
+        full_name: editedProfile.full_name,
+        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+        marketing_email: editedProfile.marketing_email,
+        marketing_notifications: editedProfile.marketing_notifications,
+      });
+
       updateUserInContext({
         ...profile,
-        ...data,
+        ...editedProfile,
       });
 
       setIsEditing(false);
-    } catch (error: any) {
-      console.error('Error updating profile:', error.message);
+    } catch (error) {
+      console.error('Error updating profile:', error);
       setError('Failed to save profile. Please try again.');
     } finally {
       setIsSaving(false);

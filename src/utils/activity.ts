@@ -6,7 +6,10 @@ export enum ActivityType {
   PLAN_CHANGED = 'plan_changed',
   PROFILE_UPDATED = 'profile_updated',
   CHILD_ADDED = 'child_added',
-  CHILD_UPDATED = 'child_updated'
+  CHILD_UPDATED = 'child_updated',
+  THEME_CHANGED = 'theme_changed',
+  STORY_VIEWED = 'story_viewed',
+  MEMBERSHIP_CHANGED = 'membership_changed'
 }
 
 interface ActivityMetadata {
@@ -14,6 +17,36 @@ interface ActivityMetadata {
   target_type?: string;
   metadata: Record<string, any>;
 }
+
+// Helper functions for specific activity types
+export const trackThemeChange = async (newTheme: 'light' | 'dark') => {
+  return trackActivity(ActivityType.THEME_CHANGED, {
+    metadata: { theme: newTheme }
+  });
+};
+
+export const trackStoryView = async (storyId: string) => {
+  return trackActivity(ActivityType.STORY_VIEWED, {
+    target_id: storyId,
+    target_type: 'story',
+    metadata: {}
+  });
+};
+
+export const trackMembershipChange = async (oldPlan: string, newPlan: string) => {
+  return trackActivity(ActivityType.MEMBERSHIP_CHANGED, {
+    metadata: {
+      previous_plan: oldPlan,
+      new_plan: newPlan
+    }
+  });
+};
+
+export const trackProfileUpdate = async (changes: Record<string, any>) => {
+  return trackActivity(ActivityType.PROFILE_UPDATED, {
+    metadata: { changes }
+  });
+};
 
 export const trackActivity = async (
   activityType: ActivityType,
