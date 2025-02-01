@@ -3,6 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_APP_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_APP_SUPABASE_ANON_KEY as string
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+console.log('supabaseUrl', supabaseUrl)
 class CircuitBreaker {
   private failures = new Map<string, number>();
   private lastFailure = new Map<string, number>();

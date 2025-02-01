@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory, Link, useLocation } from 'react-router-dom';
 import { 
   TextField, 
   Button, 
@@ -37,8 +37,23 @@ export const LoginPage: React.FC = () => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
+  const [toast, setToast] = useState<{message: string, open: boolean, severity?: 'success' | 'error'}>({ 
+    message: '', 
+    open: false 
+  });
   const history = useHistory();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('verified') === 'true') {
+      setToast({
+        message: 'Email verified successfully! You can now log in.',
+        open: true,
+        severity: 'success'
+      });
+    }
+  }, [location]);
 
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
@@ -78,7 +93,8 @@ export const LoginPage: React.FC = () => {
     } catch (error: any) {
       setToast({ 
         message: error.message,
-        open: true
+        open: true,
+        severity: 'error'
       });
     } finally {
       setLoading(false);
@@ -210,10 +226,13 @@ export const LoginPage: React.FC = () => {
 
       <Snackbar
         open={toast.open}
-        autoHideDuration={3000}
+        autoHideDuration={6000}
         onClose={() => setToast(prev => ({ ...prev, open: false }))}
       >
-        <Alert severity="error" onClose={() => setToast(prev => ({ ...prev, open: false }))}>
+        <Alert 
+          severity={toast.severity || 'error'}
+          onClose={() => setToast(prev => ({ ...prev, open: false }))}
+        >
           {toast.message}
         </Alert>
       </Snackbar>

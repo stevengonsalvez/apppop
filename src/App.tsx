@@ -46,6 +46,7 @@ import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
 import { HomePage } from './pages/Home';
+import { EmailVerification } from './pages/EmailVerification';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -191,6 +192,9 @@ const AppContent: React.FC = () => {
           </Route>
           <Route exact path="/register">
             <RegistrationPage />
+          </Route>
+          <Route exact path="/verify">
+            <EmailVerification />
           </Route>
           <Route exact path="/">
             <LandingPage />

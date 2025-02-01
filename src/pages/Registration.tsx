@@ -17,6 +17,7 @@ import {
   IconButton,
   Alert,
   Snackbar,
+  CircularProgress,
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -26,6 +27,7 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material';
+import { TermsDialog } from '../components/TermsDialog';
 
 interface RegistrationState {
   step: number;
@@ -34,6 +36,7 @@ interface RegistrationState {
   fullName: string;
   dateOfBirth: string;
   marketingConsent: boolean;
+  termsAccepted: boolean;
 }
 
 const initialState: RegistrationState = {
@@ -42,13 +45,16 @@ const initialState: RegistrationState = {
   password: '',
   fullName: '',
   dateOfBirth: '',
-  marketingConsent: false
+  marketingConsent: false,
+  termsAccepted: false
 };
 
 export const RegistrationPage: React.FC = () => {
   const [state, setState] = useState<RegistrationState>(initialState);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
   const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
+  const [loading, setLoading] = useState(false);
 
   const steps = ['Account', 'Personal Info', 'Preferences'];
 
@@ -61,14 +67,37 @@ export const RegistrationPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    console.log('Submit button clicked');
+    if (!state.termsAccepted) {
+      setToast({
+        message: 'Please accept the terms and conditions to continue',
+        open: true
+      });
+      return;
+    }
+
+    setLoading(true);
     try {
+      console.log('Attempting to sign up...');
+      // First create the user
       const { user, error: signUpError } = await supabase.auth.signUp({
         email: state.email,
-        password: state.password,
+        password: state.password
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        throw signUpError;
+      }
 
+      if (!user) {
+        throw new Error('No user returned from signup');
+      }
+
+      // Wait a moment for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Then update the profile directly
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -77,20 +106,41 @@ export const RegistrationPage: React.FC = () => {
           marketing_email: state.marketingConsent,
           marketing_notifications: state.marketingConsent,
         })
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        // Don't throw the error as the user is still created
+        console.warn('Profile update failed, but user was created');
+      }
 
+      console.log('Registration complete');
       setToast({
         message: 'Registration successful! Please check your email to verify your account.',
         open: true
       });
     } catch (error: any) {
+      console.error('Registration error:', error);
       setToast({
-        message: error.message,
+        message: error.message || 'An error occurred during registration. Please try again.',
         open: true
       });
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleOpenTerms = () => {
+    setShowTerms(true);
+  };
+
+  const handleCloseTerms = () => {
+    setShowTerms(false);
+  };
+
+  const handleAcceptTerms = () => {
+    setState(prev => ({ ...prev, termsAccepted: true }));
+    setShowTerms(false);
   };
 
   const renderStep = () => {
@@ -215,6 +265,38 @@ export const RegistrationPage: React.FC = () => {
               }
               label="I agree to receive marketing communications"
             />
+            <Box sx={{ mt: 2 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={state.termsAccepted}
+                    onChange={e => setState(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                  />
+                }
+                label={
+                  <Box component="span">
+                    I accept the{' '}
+                    <Typography
+                      component="span"
+                      color="primary"
+                      sx={{ 
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        '&:hover': {
+                          color: 'primary.dark',
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenTerms();
+                      }}
+                    >
+                      terms and conditions
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Box>
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
               <Button onClick={handleBack}>
                 Back
@@ -222,8 +304,13 @@ export const RegistrationPage: React.FC = () => {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
+                disabled={!state.termsAccepted || loading}
               >
-                Complete Registration
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  'Complete Registration'
+                )}
               </Button>
             </Box>
           </Box>
@@ -267,6 +354,12 @@ export const RegistrationPage: React.FC = () => {
           </Paper>
         </Box>
       </Container>
+
+      <TermsDialog
+        open={showTerms}
+        onClose={handleCloseTerms}
+        onAccept={handleAcceptTerms}
+      />
 
       <Snackbar
         open={toast.open}
