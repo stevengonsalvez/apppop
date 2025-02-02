@@ -195,18 +195,32 @@ const ProfilePage: React.FC = () => {
   const handleSave = async () => {
     if (!user) return;
     setIsSaving(true);
+    setError(null);
 
     try {
-      const { error } = await supabase.from('profiles').upsert({
+      console.log('Attempting to update profile with:', {
+        id: user.id,
+        full_name: editedProfile.full_name,
+        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+        marketing_email: editedProfile.marketing_email,
+        marketing_notifications: editedProfile.marketing_notifications,
+      });
+
+      const { data, error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: editedProfile.full_name,
         date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
         marketing_email: editedProfile.marketing_email,
         marketing_notifications: editedProfile.marketing_notifications,
         updated_at: new Date().toISOString(),
-      });
+      }, { returning: 'minimal' });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
+
+      console.log('Profile updated successfully');
 
       // Track profile update
       await trackProfileUpdate({
@@ -216,15 +230,19 @@ const ProfilePage: React.FC = () => {
         marketing_notifications: editedProfile.marketing_notifications,
       });
 
+      // Update local state
       updateUserInContext({
         ...profile,
-        ...editedProfile,
+        full_name: editedProfile.full_name,
+        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+        marketing_email: editedProfile.marketing_email,
+        marketing_notifications: editedProfile.marketing_notifications,
       });
 
       setIsEditing(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error);
-      setError('Failed to save profile. Please try again.');
+      setError(error?.message || error?.details || 'Failed to save profile. Please try again.');
     } finally {
       setIsSaving(false);
     }

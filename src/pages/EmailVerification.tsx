@@ -3,7 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { supabase } from '../utils/supabaseClient';
 import { Box, Typography, CircularProgress, Container, Paper } from '@mui/material';
 
-export const EmailVerification = () => {
+export const EmailVerification: React.FC = () => {
   const [verifying, setVerifying] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const history = useHistory();
@@ -22,13 +22,28 @@ export const EmailVerification = () => {
         }
 
         // Verify the token
-        const { error: verificationError } = await supabase.auth.verifyOTP({
+        const { user, error: verificationError } = await supabase.auth.verifyOTP({
           email: params.get('email') || '',
           token,
           type: 'signup'
         });
 
         if (verificationError) throw verificationError;
+
+        // Update the profile's email_verified status
+        if (user?.id) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ 
+              email_verified: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+
+          if (profileError) {
+            console.error('Error updating profile verification status:', profileError);
+          }
+        }
 
         // Wait a moment before redirecting
         setTimeout(() => {

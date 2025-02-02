@@ -144,6 +144,7 @@ const AuthenticatedApp: React.FC = () => {
           mb: ['56px', 0],
         }}
       >
+        <Route exact path="/verify" component={EmailVerification} />
         <Route exact path="/home" component={HomePage} />
         <Route exact path="/profile" component={ProfilePage} />
         <Route exact path="/plans" component={PlansPage} />

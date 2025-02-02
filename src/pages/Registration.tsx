@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -17,7 +17,6 @@ import {
   IconButton,
   Alert,
   Snackbar,
-  CircularProgress,
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -35,7 +34,10 @@ interface RegistrationState {
   password: string;
   fullName: string;
   dateOfBirth: string;
-  marketingConsent: boolean;
+  marketing: {
+    email: boolean;
+    notifications: boolean;
+  };
   termsAccepted: boolean;
 }
 
@@ -45,7 +47,10 @@ const initialState: RegistrationState = {
   password: '',
   fullName: '',
   dateOfBirth: '',
-  marketingConsent: false,
+  marketing: {
+    email: false,
+    notifications: false
+  },
   termsAccepted: false
 };
 
@@ -53,10 +58,13 @@ export const RegistrationPage: React.FC = () => {
   const [state, setState] = useState<RegistrationState>(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
-  const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
+  const history = useHistory();
 
-  const steps = ['Account', 'Personal Info', 'Preferences'];
+  const updateField = (field: keyof RegistrationState, value: any) => {
+    setState(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleNext = () => {
     setState(prev => ({ ...prev, step: prev.step + 1 }));
@@ -67,7 +75,6 @@ export const RegistrationPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    console.log('Submit button clicked');
     if (!state.termsAccepted) {
       setToast({
         message: 'Please accept the terms and conditions to continue',
@@ -78,47 +85,50 @@ export const RegistrationPage: React.FC = () => {
 
     setLoading(true);
     try {
-      console.log('Attempting to sign up...');
-      // First create the user
+      // 1. Sign up with metadata
       const { user, error: signUpError } = await supabase.auth.signUp({
         email: state.email,
         password: state.password
+      }, {
+        data: {
+          full_name: state.fullName
+        }
       });
 
-      if (signUpError) {
-        console.error('Signup error:', signUpError);
-        throw signUpError;
-      }
+      console.log('Signup response:', { user, error: signUpError });
+      if (signUpError) throw signUpError;
+      if (!user) throw new Error('No user data returned');
 
-      if (!user) {
-        throw new Error('No user returned from signup');
-      }
-
-      // Wait a moment for the trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Then update the profile directly
+      console.log('Attempting profile update for user:', user.id);
+      console.log('State:', state);
+      // 2. Update profile
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: state.fullName,
           date_of_birth: state.dateOfBirth,
-          marketing_email: state.marketingConsent,
-          marketing_notifications: state.marketingConsent,
+          marketing_email: state.marketing.email,
+          marketing_notifications: state.marketing.notifications,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
+      
+      
+      console.log('Profile update response:', { error: profileError });
+      if (profileError) throw profileError;
 
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        // Don't throw the error as the user is still created
-        console.warn('Profile update failed, but user was created');
-      }
-
-      console.log('Registration complete');
+      // 3. Sign out and redirect
+      await supabase.auth.signOut();
+      
       setToast({
         message: 'Registration successful! Please check your email to verify your account.',
         open: true
       });
+      
+      setTimeout(() => {
+        history.push('/login');
+      }, 2000);
     } catch (error: any) {
       console.error('Registration error:', error);
       setToast({
@@ -130,16 +140,8 @@ export const RegistrationPage: React.FC = () => {
     }
   };
 
-  const handleOpenTerms = () => {
-    setShowTerms(true);
-  };
-
-  const handleCloseTerms = () => {
-    setShowTerms(false);
-  };
-
   const handleAcceptTerms = () => {
-    setState(prev => ({ ...prev, termsAccepted: true }));
+    updateField('termsAccepted', true);
     setShowTerms(false);
   };
 
@@ -156,7 +158,7 @@ export const RegistrationPage: React.FC = () => {
               margin="normal"
               label="Email"
               value={state.email}
-              onChange={e => setState(prev => ({ ...prev, email: e.target.value }))}
+              onChange={e => updateField('email', e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -171,7 +173,7 @@ export const RegistrationPage: React.FC = () => {
               label="Password"
               type={showPassword ? 'text' : 'password'}
               value={state.password}
-              onChange={e => setState(prev => ({ ...prev, password: e.target.value }))}
+              onChange={e => updateField('password', e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -209,7 +211,7 @@ export const RegistrationPage: React.FC = () => {
               margin="normal"
               label="Full Name"
               value={state.fullName}
-              onChange={e => setState(prev => ({ ...prev, fullName: e.target.value }))}
+              onChange={e => updateField('fullName', e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -224,7 +226,7 @@ export const RegistrationPage: React.FC = () => {
               label="Date of Birth"
               type="date"
               value={state.dateOfBirth}
-              onChange={e => setState(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+              onChange={e => updateField('dateOfBirth', e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -259,8 +261,8 @@ export const RegistrationPage: React.FC = () => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.marketingConsent}
-                  onChange={e => setState(prev => ({ ...prev, marketingConsent: e.target.checked }))}
+                  checked={state.marketing.email}
+                  onChange={e => updateField('marketing', { ...state.marketing, email: e.target.checked })}
                 />
               }
               label="I agree to receive marketing communications"
@@ -270,7 +272,7 @@ export const RegistrationPage: React.FC = () => {
                 control={
                   <Checkbox
                     checked={state.termsAccepted}
-                    onChange={e => setState(prev => ({ ...prev, termsAccepted: e.target.checked }))}
+                    onChange={e => updateField('termsAccepted', e.target.checked)}
                   />
                 }
                 label={
@@ -288,7 +290,7 @@ export const RegistrationPage: React.FC = () => {
                       }}
                       onClick={(e) => {
                         e.preventDefault();
-                        handleOpenTerms();
+                        setShowTerms(true);
                       }}
                     >
                       terms and conditions
@@ -304,13 +306,9 @@ export const RegistrationPage: React.FC = () => {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                disabled={!state.termsAccepted || loading}
+                disabled={!state.termsAccepted}
               >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  'Complete Registration'
-                )}
+                Complete Registration
               </Button>
             </Box>
           </Box>
@@ -334,7 +332,7 @@ export const RegistrationPage: React.FC = () => {
         <Box>
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
             <Stepper activeStep={state.step - 1} alternativeLabel sx={{ mb: 4 }}>
-              {steps.map((label) => (
+              {['Account', 'Personal Info', 'Preferences'].map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
                 </Step>
@@ -357,7 +355,7 @@ export const RegistrationPage: React.FC = () => {
 
       <TermsDialog
         open={showTerms}
-        onClose={handleCloseTerms}
+        onClose={() => setShowTerms(false)}
         onAccept={handleAcceptTerms}
       />
 
