@@ -16,41 +16,40 @@ create table if not exists profiles (
 -- Set up Row Level Security (RLS)
 alter table profiles enable row level security;
 
--- Drop any existing policies to ensure clean state
-drop policy if exists "Public profiles are viewable by everyone." on profiles;
-drop policy if exists "Users can insert their own profile." on profiles;
-drop policy if exists "Users can update own profile." on profiles;
-drop policy if exists "Users can view their own profile." on profiles;
-drop policy if exists "Allow email verification update" on profiles;
-drop policy if exists "Enable read access for all users" on profiles;
-drop policy if exists "Enable insert for authenticated users only" on profiles;
-drop policy if exists "Enable update for users based on id" on profiles;
-drop policy if exists "Profiles are viewable by owner only" on profiles;
+-- Allow users to insert their own profile
+CREATE POLICY "Users can insert own profile" ON profiles
+FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Create proper restrictive policies
-create policy "Profiles are viewable by owner only"
-  on profiles for select
-  using (auth.uid() = id);
+-- Allow users to update their own profile
+CREATE POLICY "Users can update own profile" ON profiles
+FOR UPDATE USING (auth.uid() = id);
 
-create policy "Users can insert their own profile."
-  on profiles for insert
-  with check ( auth.uid() = id );
+-- Allow users to select their own profile
+CREATE POLICY "Users can view own profile" ON profiles
+FOR SELECT USING (auth.uid() = id);
 
-create policy "Users can update own profile."
-  on profiles for update
-  using ( auth.uid() = id );
-
--- Function to handle new user creation
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id)
-  values (new.id);
+  insert into public.profiles (
+    id, 
+    full_name, 
+    date_of_birth,
+    marketing_email,
+    marketing_notifications
+  )
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    (new.raw_user_meta_data->>'date_of_birth')::date,
+    (new.raw_user_meta_data->'marketing'->>'email')::boolean,
+    (new.raw_user_meta_data->'marketing'->>'notifications')::boolean
+  );
   return new;
 end;
 $$ language plpgsql security definer;
 
--- Ensure the trigger is created
+-- Create the trigger
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
