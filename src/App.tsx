@@ -32,6 +32,7 @@ import { supabase } from './utils/supabaseClient';
 import { LeftDrawer } from './components/LeftDrawer';
 import { BottomNav } from './components/BottomNav';
 import { InteractiveLogo } from './components/InteractiveLogo';
+import { tagManager } from './utils/tagManager';
 
 import './theme/variables.css';
 
@@ -96,6 +97,28 @@ const AuthenticatedApp: React.FC = () => {
     history.push(path);
     setMobileOpen(false);
   };
+
+  useEffect(() => {
+    tagManager.init();
+  }, []);
+
+  useEffect(() => {
+    // Track page views on route changes
+    const handleRouteChange = () => {
+      tagManager.pushEvent('page_view', {
+        page_title: document.title,
+        page_path: window.location.pathname,
+        page_location: window.location.href
+      });
+    };
+
+    // Track initial page view
+    handleRouteChange();
+
+    // Listen for route changes
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -172,15 +195,19 @@ const AppContent: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    setSession(supabase.auth.session());
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setSession(session);
     });
 
     cookieManager.initializeDefaultConsents();
 
     return () => {
-      authListener?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -212,6 +239,28 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  useEffect(() => {
+    tagManager.init();
+  }, []);
+
+  useEffect(() => {
+    // Track page views on route changes
+    const handleRouteChange = () => {
+      tagManager.pushEvent('page_view', {
+        page_title: document.title,
+        page_path: window.location.pathname,
+        page_location: window.location.href
+      });
+    };
+
+    // Track initial page view
+    handleRouteChange();
+
+    // Listen for route changes
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, []);
+
   return (
     <NewThemeProvider>
       <CssBaseline />

@@ -3,6 +3,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { supabase } from '../utils/supabaseClient';
 import { cookieManager } from '../utils/cookieManager';
 import { trackProfileUpdate } from '../utils/activity';
+import { tagManager } from '../utils/tagManager';
 import {
   AppBar,
   Toolbar,
@@ -198,43 +199,33 @@ const ProfilePage: React.FC = () => {
     setError(null);
 
     try {
-      console.log('Attempting to update profile with:', {
-        id: user.id,
-        full_name: editedProfile.full_name,
-        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
-        marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications,
-      });
-
-      const { data, error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: editedProfile.full_name,
         date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
         marketing_email: editedProfile.marketing_email,
         marketing_notifications: editedProfile.marketing_notifications,
         updated_at: new Date().toISOString(),
-      }, { returning: 'minimal' });
+      });
 
-      if (error) {
-        console.error('Supabase error details:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Profile updated successfully');
+      // Track which fields were updated
+      const updatedFields = Object.keys(editedProfile).filter(key => 
+        editedProfile[key as keyof typeof editedProfile] !== profile?.[key as keyof typeof profile]
+      );
 
-      // Track profile update
-      await trackProfileUpdate({
-        full_name: editedProfile.full_name,
-        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+      tagManager.pushEvent('profile_update', {
+        updated_fields: updatedFields,
         marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications,
+        marketing_notifications: editedProfile.marketing_notifications
       });
 
       // Update local state
       updateUserInContext({
-        ...profile,
+        ...profile!,
         full_name: editedProfile.full_name,
-        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
+        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0],
         marketing_email: editedProfile.marketing_email,
         marketing_notifications: editedProfile.marketing_notifications,
       });
@@ -243,6 +234,11 @@ const ProfilePage: React.FC = () => {
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setError(error?.message || error?.details || 'Failed to save profile. Please try again.');
+      
+      tagManager.pushEvent('profile_update_error', {
+        error_type: 'save_error',
+        error_message: error.message
+      });
     } finally {
       setIsSaving(false);
     }

@@ -58,3 +58,4 @@ yarn-error.log*
 
 # Sentry Config File
 .env.sentry-build-plugin
+config/gtm-credentials.json

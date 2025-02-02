@@ -21,6 +21,7 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material';
+import { tagManager } from '../utils/tagManager';
 
 interface LoginFormData {
   email: string;
@@ -86,11 +87,28 @@ export const LoginPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signIn(formData);
+      const { error } = await supabase.auth.signInWithPassword(formData);
       if (error) throw error;
+      
+      // Get user ID after successful login
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      tagManager.pushEvent('login', {
+        method: 'email',
+        success: true,
+        user_properties: {
+          userId: user?.id
+        }
+      });
       
       history.push('/home');
     } catch (error: any) {
+      tagManager.pushEvent('login', {
+        method: 'email',
+        success: false,
+        error_message: error.message
+      });
+      
       setToast({ 
         message: error.message,
         open: true,
@@ -98,6 +116,37 @@ export const LoginPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'github') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider });
+      if (error) throw error;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      tagManager.pushEvent('login', {
+        method: provider,
+        success: true,
+        user_properties: {
+          userId: user?.id
+        }
+      });
+      
+      history.push('/home');
+    } catch (error: any) {
+      tagManager.pushEvent('login', {
+        method: provider,
+        success: false,
+        error_message: error.message
+      });
+      
+      setToast({ 
+        message: 'An error occurred while logging in with social provider',
+        open: true,
+        severity: 'error'
+      });
     }
   };
 
