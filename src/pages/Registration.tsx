@@ -85,41 +85,22 @@ export const RegistrationPage: React.FC = () => {
 
     setLoading(true);
     try {
-      // 1. Sign up with metadata
-      const { user, error: signUpError } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: state.email,
-        password: state.password
-      }, {
-        data: {
-          full_name: state.fullName
+        password: state.password,
+        options: {
+          data: {
+            full_name: state.fullName,
+            date_of_birth: state.dateOfBirth,
+            marketing: {
+              email: state.marketing.email,
+              notifications: state.marketing.notifications
+            }
+          }
         }
       });
 
-      console.log('Signup response:', { user, error: signUpError });
-      if (signUpError) throw signUpError;
-      if (!user) throw new Error('No user data returned');
-
-      console.log('Attempting profile update for user:', user.id);
-      console.log('State:', state);
-      // 2. Update profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          full_name: state.fullName,
-          date_of_birth: state.dateOfBirth,
-          marketing_email: state.marketing.email,
-          marketing_notifications: state.marketing.notifications,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-      
-      
-      console.log('Profile update response:', { error: profileError });
-      if (profileError) throw profileError;
-
-      // 3. Sign out and redirect
-      await supabase.auth.signOut();
+      if (error) throw error;
       
       setToast({
         message: 'Registration successful! Please check your email to verify your account.',
