@@ -22,7 +22,7 @@ export const EmailVerification: React.FC = () => {
         }
 
         // Verify the token
-        const { user, error: verificationError } = await supabase.auth.verifyOTP({
+        const { data, error: verificationError } = await supabase.auth.verifyOtp({
           email: params.get('email') || '',
           token,
           type: 'signup'
@@ -31,14 +31,14 @@ export const EmailVerification: React.FC = () => {
         if (verificationError) throw verificationError;
 
         // Update the profile's email_verified status
-        if (user?.id) {
+        if (data.user?.id) {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({ 
               email_verified: true,
               updated_at: new Date().toISOString()
             })
-            .eq('id', user.id);
+            .eq('id', data.user.id);
 
           if (profileError) {
             console.error('Error updating profile verification status:', profileError);

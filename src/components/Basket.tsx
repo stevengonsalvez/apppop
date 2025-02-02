@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -11,6 +11,7 @@ import {
   Button
 } from '@mui/material';
 import { Plan, Addon } from '../types/plan';
+import { tagManager } from '../utils/tagManager';
 
 interface BasketProps {
   plan: Plan | null;
@@ -31,6 +32,59 @@ const Basket: React.FC<BasketProps> = ({
       total += addon.price;
     });
     return total.toFixed(2);
+  };
+
+  useEffect(() => {
+    if (plan) {
+      tagManager.pushEvent('view_item', {
+        currency: 'USD',
+        value: plan.price,
+        items: [{
+          item_id: plan.id,
+          item_name: plan.name,
+          price: plan.price,
+          item_category: 'Subscription Plan',
+          item_variant: plan.billing_period
+        }]
+      });
+    }
+  }, [plan]);
+
+  const handlePurchase = async () => {
+    if (!plan) return;
+    
+    try {
+      // ... existing purchase logic ...
+      
+      tagManager.pushEvent('begin_checkout', {
+        currency: 'USD',
+        value: Number(calculateTotal()),
+        items: [
+          {
+            item_id: plan.id,
+            item_name: plan.name,
+            price: plan.price,
+            item_category: 'Subscription Plan',
+            item_variant: plan.billing_period
+          },
+          ...addons.map(addon => ({
+            item_id: addon.id,
+            item_name: addon.name,
+            price: addon.price,
+            item_category: 'Addon',
+            item_variant: addon.billing_period
+          }))
+        ]
+      });
+      
+    } catch (error) {
+      if (error instanceof Error) {
+        tagManager.pushEvent('checkout_error', {
+          error_type: 'purchase_error',
+          error_message: error.message
+        });
+      }
+    }
   };
 
   if (!plan) return null;
@@ -104,7 +158,7 @@ const Basket: React.FC<BasketProps> = ({
           color="primary"
           fullWidth
           size="large"
-          onClick={onCheckout}
+          onClick={onCheckout || handlePurchase}
           sx={{ mt: 3 }}
         >
           Proceed to Payment

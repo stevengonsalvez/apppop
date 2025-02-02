@@ -53,7 +53,7 @@ export const trackActivity = async (
   data: ActivityMetadata
 ) => {
   try {
-    const user = supabase.auth.user();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const { target_id, target_type, metadata = {} } = data;

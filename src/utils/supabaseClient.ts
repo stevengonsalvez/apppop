@@ -109,99 +109,10 @@ const requestQueue = new RequestQueue();
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
+    persistSession: true,
     detectSessionInUrl: true
-  },
-  global: {
-    headers: {
-      'x-my-custom-header': 'shot-app',
-      'x-client-timestamp': new Date().toISOString(),
-    },
-    fetch: (url, options) => {
-      const endpoint = new URL(url).pathname;
-      return requestQueue.add(async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-        const requestId = crypto.randomUUID();
-        options.headers = {
-          ...options.headers,
-          'x-request-id': requestId,
-        };
-
-        const startTime = Date.now();
-        try {
-          const response = await fetch(url, {
-            ...options,
-            signal: controller.signal,
-          });
-
-          if (!response.ok) {
-            circuitBreaker.recordFailure(endpoint);
-          }
-
-          const duration = Date.now() - startTime;
-          if (duration > 5000) {
-            console.warn(`Slow Supabase request (${duration}ms):`, url);
-          }
-
-          const remainingRequests = response.headers.get('x-ratelimit-remaining');
-          if (remainingRequests && parseInt(remainingRequests) < 10) {
-            console.warn('Approaching Supabase rate limit:', remainingRequests);
-          }
-
-          // Add exponential backoff for rate limits
-          if (response.status === 429) {
-            const retryAfter = response.headers.get('retry-after') || '5';
-            const delay = parseInt(retryAfter) * 1000;
-            await new Promise(resolve => setTimeout(resolve, delay));
-            return fetch(url, options); // Retry the request
-          }
-
-          return response;
-        } catch (error) {
-          circuitBreaker.recordFailure(endpoint);
-          const duration = Date.now() - startTime;
-          if (error.name === 'AbortError') {
-            console.warn('Request timed out:', { url, requestId });
-          } else {
-            console.error(`Request failed after ${duration}ms:`, {
-              url,
-              error: error.message,
-              requestId,
-            });
-          }
-          throw error;
-        } finally {
-          clearTimeout(timeoutId);
-        }
-      }, endpoint);
-    }
-  },
-  db: {
-    schema: 'public',
-  },
-  realtime: {
-    timeout: 20000,
-    params: {
-      eventsPerSecond: 1, // Reduced from 2
-    },
-    heartbeat: {
-      interval: 15000,
-      maxRetries: 3
-    }
-  },
-  shouldRetry: (err) => {
-    const statusCode = err?.status || err?.statusCode;
-    const shouldRetry = statusCode === 408 || statusCode === 429 || statusCode === 503;
-    if (shouldRetry) {
-      console.warn('Retrying Supabase request due to error:', statusCode);
-    }
-    return shouldRetry;
-  },
-  retryCount: 2,
-  retryDelay: 1000
+  }
 });
 
 // Auth state change handler
@@ -227,7 +138,7 @@ supabase.auth.onAuthStateChange((event, session) => {
 // Modified batch requests to use the queue
 export const batchRequests = async <T>(
   requests: Promise<T>[],
-  batchSize = 2  // Reduced from 3
+  batchSize = 2
 ): Promise<T[]> => {
   const results: T[] = [];
   for (let i = 0; i < requests.length; i += batchSize) {
@@ -241,9 +152,8 @@ export const batchRequests = async <T>(
       )
     );
     results.push(...batchResults.filter(Boolean));
-    // Increased delay between batches
     if (i + batchSize < requests.length) {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Increased to 2s
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
   return results;

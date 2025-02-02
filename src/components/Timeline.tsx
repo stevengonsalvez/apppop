@@ -118,7 +118,7 @@ const TimelineComponent: React.FC = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const user = supabase.auth.user();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Not authenticated');
 
         const { data, error } = await supabase

@@ -26,7 +26,7 @@ export const Subscription: React.FC<SubscriptionProps> = ({ currentPlan, availab
     try {
       // Here you would typically integrate with your payment provider (e.g., Stripe)
       // For this example, we'll just update the user's plan in Supabase
-      const user = supabase.auth.user();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
       const { error: updateError } = await supabase

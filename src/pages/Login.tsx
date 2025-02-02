@@ -21,6 +21,7 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material';
+import { tagManager } from '../utils/tagManager';
 
 interface LoginFormData {
   email: string;
@@ -86,11 +87,28 @@ export const LoginPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signIn(formData);
+      const { error } = await supabase.auth.signInWithPassword(formData);
       if (error) throw error;
+      
+      // Get user ID after successful login
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      tagManager.pushEvent('login_success', {
+        method: 'email',
+        user_id: user?.id,
+        email_domain: formData.email.split('@')[1],
+        timestamp: new Date().toISOString()
+      });
       
       history.push('/home');
     } catch (error: any) {
+      tagManager.pushEvent('login_error', {
+        method: 'email',
+        error_type: error.name,
+        error_message: error.message,
+        timestamp: new Date().toISOString()
+      });
+      
       setToast({ 
         message: error.message,
         open: true,
@@ -98,6 +116,41 @@ export const LoginPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'github') => {
+    try {
+      tagManager.pushEvent('social_login_start', {
+        method: provider,
+        timestamp: new Date().toISOString()
+      });
+
+      const { error } = await supabase.auth.signInWithOAuth({ provider });
+      if (error) throw error;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      tagManager.pushEvent('social_login_success', {
+        method: provider,
+        user_id: user?.id,
+        timestamp: new Date().toISOString()
+      });
+      
+      history.push('/home');
+    } catch (error: any) {
+      tagManager.pushEvent('social_login_error', {
+        method: provider,
+        error_type: error.name,
+        error_message: error.message,
+        timestamp: new Date().toISOString()
+      });
+      
+      setToast({ 
+        message: 'An error occurred while logging in with social provider',
+        open: true,
+        severity: 'error'
+      });
     }
   };
 

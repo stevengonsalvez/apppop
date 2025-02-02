@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 interface UserProfile {
   id?: string;
@@ -13,7 +14,7 @@ interface UserProfile {
 
 interface UserContextType {
   profile: UserProfile | null;
-  user: any;
+  user: User | null;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
   updateUserInContext: (updatedProfile: UserProfile) => void;
   fetchUserProfile: () => Promise<void>;
@@ -32,7 +33,7 @@ export const useUserContext = () => {
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [user, setUser] = useState(supabase.auth.user());
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const updateUserInContext = (updatedProfile: UserProfile) => {
@@ -43,7 +44,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const fetchUserProfile = async () => {
-    const currentUser = supabase.auth.user();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
     if (!currentUser) {
       setLoading(false);
       return;
@@ -72,9 +73,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    fetchUserProfile();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile();
+      }
+    });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         setUser(session?.user ?? null);
         fetchUserProfile();
@@ -85,7 +92,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => {
-      authListener?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
