@@ -24,6 +24,15 @@ async function createWithRetry(operation: () => Promise<any>, name: string, retr
     try {
       return await operation();
     } catch (error: any) {
+      const isDuplicateError = error.message?.includes('duplicate name') || 
+                              error.response?.data?.error?.message?.includes('duplicate name') ||
+                              error.response?.status === 409;
+      
+      if (isDuplicateError) {
+        console.log(`${name} already exists, skipping...`);
+        return null;
+      }
+      
       console.error(`Failed to create ${name} (attempt ${i + 1}/${retries}):`, {
         message: error.message,
         details: error.response?.data || error
@@ -148,7 +157,7 @@ class GTMSetup {
         {
           name: 'User ID',
           type: 'v',
-          variableType: 'v',  // Changed from 'jsm' to 'v' for Data Layer Variable
+          variableType: 'v',
           parameter: [
             {
               type: 'template',
@@ -158,7 +167,51 @@ class GTMSetup {
             {
               type: 'template',
               key: 'name',
-              value: 'user_properties.userId'
+              value: 'user_id'
+            },
+            {
+              type: 'template',
+              key: 'dataLayer',
+              value: '{{DataLayer}}'
+            }
+          ]
+        },
+        {
+          name: 'Event Error Message',
+          type: 'v',
+          variableType: 'v',
+          parameter: [
+            {
+              type: 'template',
+              key: 'dataLayerVersion',
+              value: '2'
+            },
+            {
+              type: 'template',
+              key: 'name',
+              value: 'error_message'
+            },
+            {
+              type: 'template',
+              key: 'dataLayer',
+              value: '{{DataLayer}}'
+            }
+          ]
+        },
+        {
+          name: 'Social Platform',
+          type: 'v',
+          variableType: 'v',
+          parameter: [
+            {
+              type: 'template',
+              key: 'dataLayerVersion',
+              value: '2'
+            },
+            {
+              type: 'template',
+              key: 'name',
+              value: 'method'
             },
             {
               type: 'template',
@@ -304,13 +357,20 @@ class GTMSetup {
       for (const variable of customVars) {
         try {
           console.log(`Creating variable: ${variable.name}...`);
-          await createWithRetry(
+          const result = await createWithRetry(
             () => this.createVariable(variable),
             `custom variable ${variable.name}`
           );
-          console.log(`✅ Created variable: ${variable.name}`);
+          if (result) {
+            console.log(`✅ Created variable: ${variable.name}`);
+          }
         } catch (error: any) {
-          if (error.response?.status === 409) {
+          // Check if it's a duplicate error in any form
+          const isDuplicateError = error.message?.includes('duplicate name') || 
+                                 error.response?.data?.error?.message?.includes('duplicate name') ||
+                                 error.response?.status === 409;
+          
+          if (isDuplicateError) {
             console.log(`Variable ${variable.name} already exists, skipping...`);
             continue;
           }
@@ -326,7 +386,7 @@ class GTMSetup {
           type: 'pageview'
         },
         {
-          name: 'Login Event',
+          name: 'Login Success Trigger',
           type: 'customEvent',
           customEventFilter: [{
             type: 'equals',
@@ -334,12 +394,88 @@ class GTMSetup {
               {
                 type: 'template',
                 key: 'arg0',
-                value: '{{Event}}'
+                value: '{{_event}}'
               },
               {
                 type: 'template',
                 key: 'arg1',
-                value: 'login'
+                value: 'login_success'
+              }
+            ]
+          }]
+        },
+        {
+          name: 'Login Error Trigger',
+          type: 'customEvent',
+          customEventFilter: [{
+            type: 'equals',
+            parameter: [
+              {
+                type: 'template',
+                key: 'arg0',
+                value: '{{_event}}'
+              },
+              {
+                type: 'template',
+                key: 'arg1',
+                value: 'login_error'
+              }
+            ]
+          }]
+        },
+        {
+          name: 'Social Login Start Trigger',
+          type: 'customEvent',
+          customEventFilter: [{
+            type: 'equals',
+            parameter: [
+              {
+                type: 'template',
+                key: 'arg0',
+                value: '{{_event}}'
+              },
+              {
+                type: 'template',
+                key: 'arg1',
+                value: 'social_login_start'
+              }
+            ]
+          }]
+        },
+        {
+          name: 'Social Login Success Trigger',
+          type: 'customEvent',
+          customEventFilter: [{
+            type: 'equals',
+            parameter: [
+              {
+                type: 'template',
+                key: 'arg0',
+                value: '{{_event}}'
+              },
+              {
+                type: 'template',
+                key: 'arg1',
+                value: 'social_login_success'
+              }
+            ]
+          }]
+        },
+        {
+          name: 'Social Login Error Trigger',
+          type: 'customEvent',
+          customEventFilter: [{
+            type: 'equals',
+            parameter: [
+              {
+                type: 'template',
+                key: 'arg0',
+                value: '{{_event}}'
+              },
+              {
+                type: 'template',
+                key: 'arg1',
+                value: 'social_login_error'
               }
             ]
           }]
@@ -353,7 +489,7 @@ class GTMSetup {
               {
                 type: 'template',
                 key: 'arg0',
-                value: '{{Event}}'
+                value: '{{_event}}'
               },
               {
                 type: 'template',
@@ -372,7 +508,7 @@ class GTMSetup {
               {
                 type: 'template',
                 key: 'arg0',
-                value: '{{Event}}'
+                value: '{{_event}}'
               },
               {
                 type: 'template',
@@ -391,7 +527,7 @@ class GTMSetup {
               {
                 type: 'template',
                 key: 'arg0',
-                value: '{{Event}}'
+                value: '{{_event}}'
               },
               {
                 type: 'template',
@@ -404,21 +540,47 @@ class GTMSetup {
       ];
 
       const createdTriggers: Record<string, string> = {};
+      
+      // First, get existing triggers
+      console.log('Fetching existing triggers...');
+      const existingTriggersResponse = await this.tagmanager.accounts.containers.workspaces.triggers.list({
+        parent: this.path
+      });
+      const existingTriggers = existingTriggersResponse.data.trigger || [];
+      
       for (const trigger of triggers) {
         try {
+          console.log(`Setting up trigger: ${trigger.name}...`);
+          
+          // Check if trigger already exists
+          const existingTrigger = existingTriggers.find(t => t.name === trigger.name);
+          
+          if (existingTrigger?.triggerId) {
+            console.log(`Trigger ${trigger.name} already exists with ID: ${existingTrigger.triggerId}`);
+            createdTriggers[trigger.name] = existingTrigger.triggerId;
+            continue;
+          }
+
           const result = await createWithRetry(
             () => this.createTrigger(trigger),
             `trigger ${trigger.name}`
           );
-          createdTriggers[trigger.name] = result.data.triggerId;
+          
+          if (result?.data?.triggerId) {
+            createdTriggers[trigger.name] = result.data.triggerId;
+            console.log(`✅ Created trigger: ${trigger.name} with ID: ${result.data.triggerId}`);
+          } else {
+            console.error(`Failed to get trigger ID for ${trigger.name}`);
+            throw new Error(`Failed to get trigger ID for ${trigger.name}`);
+          }
         } catch (error: any) {
           if (error.response?.status === 409) {
-            console.log(`Trigger ${trigger.name} already exists, skipping...`);
-            // Try to fetch existing trigger ID
-            const existingTriggers = await this.tagmanager.accounts.containers.workspaces.triggers.list({
+            console.log(`Trigger ${trigger.name} already exists, fetching ID...`);
+            // Fetch the trigger ID if it exists
+            const existingTriggersRefresh = await this.tagmanager.accounts.containers.workspaces.triggers.list({
               parent: this.path
             });
-            const existingTrigger = existingTriggers.data.trigger?.find(t => t.name === trigger.name);
+            const existingTrigger = existingTriggersRefresh.data.trigger?.find(t => t.name === trigger.name);
             if (existingTrigger?.triggerId) {
               createdTriggers[trigger.name] = existingTrigger.triggerId;
               continue;
@@ -428,40 +590,62 @@ class GTMSetup {
         }
       }
 
+      // Verify we have all required trigger IDs
+      const missingTriggers = triggers.filter(t => !createdTriggers[t.name]);
+      if (missingTriggers.length > 0) {
+        throw new Error(`Missing trigger IDs for: ${missingTriggers.map(t => t.name).join(', ')}`);
+      }
+
       // Create GA4 Configuration Tag
       console.log('Creating GA4 configuration tag...');
-      try {
-        await createWithRetry(
-          () => this.createTag({
-            name: 'GA4 - Configuration',
-            type: 'gaawc',
-            parameter: [
-              {
-                type: 'template',
-                key: 'measurementId',
-                value: process.env.VITE_GA4_MEASUREMENT_ID
-              },
-              {
-                type: 'boolean',
-                key: 'sendPageView',
-                value: true
-              },
-              {
-                type: 'boolean',
-                key: 'enableSendToServerContainer',
-                value: false
-              }
-            ],
-            firingTriggerId: [createdTriggers['All Pages']]
-          }),
-          'GA4 configuration tag'
-        );
-      } catch (error: any) {
-        if (error.response?.status === 409) {
-          console.log('GA4 configuration tag already exists, skipping...');
-        } else {
+      
+      // First, get existing tags
+      console.log('Fetching existing tags...');
+      const existingTagsResponse = await this.tagmanager.accounts.containers.workspaces.tags.list({
+        parent: this.path
+      });
+      const existingTags = existingTagsResponse.data.tag || [];
+
+      // Create GA4 Configuration Tag if it doesn't exist
+      const ga4ConfigTag = {
+        name: 'GA4 - Configuration',
+        type: 'gaawc',
+        parameter: [
+          {
+            type: 'template',
+            key: 'measurementId',
+            value: process.env.VITE_GA4_MEASUREMENT_ID
+          },
+          {
+            type: 'boolean',
+            key: 'sendPageView',
+            value: 'true'
+          },
+          {
+            type: 'boolean',
+            key: 'enableSendToServerContainer',
+            value: 'false'
+          }
+        ],
+        firingTriggerId: [createdTriggers['All Pages']]
+      };
+
+      if (!existingTags.some(t => t.name === ga4ConfigTag.name)) {
+        try {
+          console.log('Creating GA4 configuration tag...');
+          const result = await createWithRetry(
+            () => this.createTag(ga4ConfigTag),
+            'GA4 configuration tag'
+          );
+          if (result?.data?.tagId) {
+            console.log('✅ Created GA4 configuration tag');
+          }
+        } catch (error: any) {
+          console.error('Failed to create GA4 configuration tag:', error);
           throw error;
         }
+      } else {
+        console.log('GA4 configuration tag already exists, skipping...');
       }
 
       // Create GA4 Event Tags
@@ -475,6 +659,11 @@ class GTMSetup {
               type: 'template',
               key: 'eventName',
               value: 'login'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
             },
             {
               type: 'list',
@@ -513,7 +702,159 @@ class GTMSetup {
               ]
             }
           ],
-          firingTriggerId: [createdTriggers['Login Event']]
+          firingTriggerId: [createdTriggers['Login Success Trigger']]
+        },
+        {
+          name: 'GA4 - Login Error',
+          type: 'gaawe',
+          parameter: [
+            {
+              type: 'template',
+              key: 'eventName',
+              value: 'login_error'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
+            },
+            {
+              type: 'list',
+              key: 'eventParameters',
+              list: [
+                {
+                  type: 'map',
+                  map: [
+                    {
+                      type: 'template',
+                      key: 'name',
+                      value: 'error_message'
+                    },
+                    {
+                      type: 'template',
+                      key: 'value',
+                      value: '{{Event Error Message}}'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          firingTriggerId: [createdTriggers['Login Error Trigger']]
+        },
+        {
+          name: 'GA4 - Social Login Start',
+          type: 'gaawe',
+          parameter: [
+            {
+              type: 'template',
+              key: 'eventName',
+              value: 'social_login_start'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
+            },
+            {
+              type: 'list',
+              key: 'eventParameters',
+              list: [
+                {
+                  type: 'map',
+                  map: [
+                    {
+                      type: 'template',
+                      key: 'name',
+                      value: 'social_platform'
+                    },
+                    {
+                      type: 'template',
+                      key: 'value',
+                      value: '{{Social Platform}}'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          firingTriggerId: [createdTriggers['Social Login Start Trigger']]
+        },
+        {
+          name: 'GA4 - Social Login Success',
+          type: 'gaawe',
+          parameter: [
+            {
+              type: 'template',
+              key: 'eventName',
+              value: 'social_login_success'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
+            },
+            {
+              type: 'list',
+              key: 'eventParameters',
+              list: [
+                {
+                  type: 'map',
+                  map: [
+                    {
+                      type: 'template',
+                      key: 'name',
+                      value: 'social_platform'
+                    },
+                    {
+                      type: 'template',
+                      key: 'value',
+                      value: '{{Social Platform}}'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          firingTriggerId: [createdTriggers['Social Login Success Trigger']]
+        },
+        {
+          name: 'GA4 - Social Login Error',
+          type: 'gaawe',
+          parameter: [
+            {
+              type: 'template',
+              key: 'eventName',
+              value: 'social_login_error'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
+            },
+            {
+              type: 'list',
+              key: 'eventParameters',
+              list: [
+                {
+                  type: 'map',
+                  map: [
+                    {
+                      type: 'template',
+                      key: 'name',
+                      value: 'error_message'
+                    },
+                    {
+                      type: 'template',
+                      key: 'value',
+                      value: '{{Event Error Message}}'
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          firingTriggerId: [createdTriggers['Social Login Error Trigger']]
         },
         {
           name: 'GA4 - Profile Update',
@@ -523,6 +864,11 @@ class GTMSetup {
               type: 'template',
               key: 'eventName',
               value: 'profile_update'
+            },
+            {
+              type: 'template',
+              key: 'measurementIdOverride',
+              value: process.env.VITE_GA4_MEASUREMENT_ID
             },
             {
               type: 'list',
@@ -559,13 +905,29 @@ class GTMSetup {
             },
             {
               type: 'template',
-              key: 'measurementId',
+              key: 'measurementIdOverride',
               value: process.env.VITE_GA4_MEASUREMENT_ID
             },
             {
-              type: 'template',
+              type: 'list',
               key: 'userProperties',
-              value: '{"user_id": "{{User ID}}"}'
+              list: [
+                {
+                  type: 'map',
+                  map: [
+                    {
+                      type: 'template',
+                      key: 'name',
+                      value: 'user_id'
+                    },
+                    {
+                      type: 'template',
+                      key: 'value',
+                      value: '{{User ID}}'
+                    }
+                  ]
+                }
+              ]
             },
             {
               type: 'list',
@@ -602,7 +964,7 @@ class GTMSetup {
             },
             {
               type: 'template',
-              key: 'measurementId',
+              key: 'measurementIdOverride',
               value: process.env.VITE_GA4_MEASUREMENT_ID
             },
             {
@@ -648,12 +1010,20 @@ class GTMSetup {
 
       for (const tag of eventTags) {
         try {
+          // Check if tag already exists
+          if (existingTags.some(t => t.name === tag.name)) {
+            console.log(`Tag ${tag.name} already exists, skipping...`);
+            continue;
+          }
+
           console.log(`Creating tag: ${tag.name}...`);
-          await createWithRetry(
+          const result = await createWithRetry(
             () => this.createTag(tag),
             `GA4 event tag ${tag.name}`
           );
-          console.log(`✅ Created tag: ${tag.name}`);
+          if (result?.data?.tagId) {
+            console.log(`✅ Created tag: ${tag.name}`);
+          }
         } catch (error: any) {
           if (error.response?.status === 409) {
             console.log(`Tag ${tag.name} already exists, skipping...`);

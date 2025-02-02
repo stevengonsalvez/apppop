@@ -184,3 +184,66 @@ Common issues and solutions:
 - Configure custom variables and triggers
 - Set up event tracking
 - Test data flow in GA4 real-time reports 
+
+
+# Debugging
+
+## Validate specific events
+
+1. Open Chrome DevTools
+2. Go to Console tab
+3. Type this to monitor dataLayer pushes:
+   dataLayer = new Proxy(dataLayer || [], {
+     get: function(target, property) {
+       return target[property];
+     },
+     set: function(target, property, value) {
+       console.log('dataLayer update:', value);
+       target[property] = value;
+       return true;
+     }
+   });
+
+## Using browser console
+
+1. Open Chrome DevTools (F12)
+2. Go to Network tab
+3. Filter for "collect" or "google-analytics"
+4. Perform actions on your site (like login)
+5. You should see requests to Google Analytics
+
+
+## Using GTM Preview Mode
+
+1. Go to GTM
+2. Click "Preview"
+3. Perform actions on your site
+4. Check data in GA4 real-time reports
+5. Verify events in GA4 DebugView
+
+
+## Using the test function in tagManager.ts
+
+1. Open Chrome DevTools (F12)
+2. Go to Console tab
+3. Type this to test GTM/GA4 connection:
+   window.tagManager.testGA4Connection()
+
+Go to google analytics and check the real-time reports. You should see the event "test_ga4_connection" in the events list.
+if you don't see it, check the network tab in devtools and look for requests to google analytics. filter for "collect" or "google-analytics"
+
+
+## Possible issues
+
+### Ad blocker
+
+If you have an ad blocker, it might block the google analytics request. You can try to whitelist the google analytics domain or disable the ad blocker.
+
+Alternatively, you can run in incognito mode.
+
+### Firewall
+
+If you have a firewall, it might block the google analytics request. You can try to whitelist the google analytics domain or disable the firewall.
+
+
+

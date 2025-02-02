@@ -93,20 +93,20 @@ export const LoginPage: React.FC = () => {
       // Get user ID after successful login
       const { data: { user } } = await supabase.auth.getUser();
       
-      tagManager.pushEvent('login', {
+      tagManager.pushEvent('login_success', {
         method: 'email',
-        success: true,
-        user_properties: {
-          userId: user?.id
-        }
+        user_id: user?.id,
+        email_domain: formData.email.split('@')[1],
+        timestamp: new Date().toISOString()
       });
       
       history.push('/home');
     } catch (error: any) {
-      tagManager.pushEvent('login', {
+      tagManager.pushEvent('login_error', {
         method: 'email',
-        success: false,
-        error_message: error.message
+        error_type: error.name,
+        error_message: error.message,
+        timestamp: new Date().toISOString()
       });
       
       setToast({ 
@@ -121,25 +121,29 @@ export const LoginPage: React.FC = () => {
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     try {
+      tagManager.pushEvent('social_login_start', {
+        method: provider,
+        timestamp: new Date().toISOString()
+      });
+
       const { error } = await supabase.auth.signInWithOAuth({ provider });
       if (error) throw error;
       
       const { data: { user } } = await supabase.auth.getUser();
       
-      tagManager.pushEvent('login', {
+      tagManager.pushEvent('social_login_success', {
         method: provider,
-        success: true,
-        user_properties: {
-          userId: user?.id
-        }
+        user_id: user?.id,
+        timestamp: new Date().toISOString()
       });
       
       history.push('/home');
     } catch (error: any) {
-      tagManager.pushEvent('login', {
+      tagManager.pushEvent('social_login_error', {
         method: provider,
-        success: false,
-        error_message: error.message
+        error_type: error.name,
+        error_message: error.message,
+        timestamp: new Date().toISOString()
       });
       
       setToast({ 
