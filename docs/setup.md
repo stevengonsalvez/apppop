@@ -95,24 +95,3 @@ const mainNavItems = [
 ];
 ```
 
-## Best Practices
-
-1. **Cookie Consent**: Always check consent before initializing analytics:
-```typescript
-if (cookieManager.hasConsent('analytics')) {
-  // Initialize analytics
-}
-```
-
-2. **Navigation**: Use the `useHistory` hook for navigation:
-```typescript
-const history = useHistory();
-history.push('/your-path');
-```
-
-3. **Protected Routes**: Wrap authenticated routes with `PrivateRoute`:
-```typescript
-<PrivateRoute exact path="/protected">
-  <YourComponent />
-</PrivateRoute>
-``` 
