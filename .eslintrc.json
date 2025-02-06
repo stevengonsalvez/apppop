@@ -1,0 +1,83 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:jsx-a11y/recommended",
+    "prettier"
+  ],
+  "globals": {
+    "React": true,
+    "Deno": true,
+    "ImportMeta": true,
+    "ActiveXObject": true,
+    "System": true,
+    "importScripts": true,
+    "Bun": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "import",
+    "jsx-a11y"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { 
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "import/no-duplicates": "warn",
+    "@typescript-eslint/ban-types": "warn",
+    "no-prototype-builtins": "warn",
+    "no-control-regex": "warn",
+    "no-undef": "error",
+    "no-cond-assign": ["error", "except-parens"],
+    "@typescript-eslint/no-this-alias": "warn",
+    "react-hooks/rules-of-hooks": "warn",
+    "import/no-unresolved": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "no-useless-escape": "warn",
+    "no-func-assign": "warn",
+    "no-unsafe-finally": "warn",
+    "no-sparse-arrays": "warn",
+    "no-extra-boolean-cast": "warn",
+    "no-constant-condition": "warn",
+    "no-fallthrough": "warn",
+    "no-self-assign": "warn",
+    "react/display-name": "warn",
+    "react/no-unescaped-entities": "warn"
+  },
+  "ignorePatterns": ["dist/*", "node_modules/*"]
+} 

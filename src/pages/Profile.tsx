@@ -2,34 +2,24 @@ import { useState, useEffect } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import { supabase } from '../utils/supabaseClient';
 import { cookieManager } from '../utils/cookieManager';
-import { trackProfileUpdate } from '../utils/activity';
 import { tagManager } from '../utils/tagManager';
 import {
-  AppBar,
-  Toolbar,
   IconButton,
   Typography,
   Box,
   Avatar,
   TextField,
-  Paper,
-  Switch,
-  Button,
   Stack,
   Container,
-  FormControlLabel,
-  Divider,
-  Card,
-  CardContent,
   ToggleButton,
   ToggleButtonGroup,
   styled,
   alpha,
   Tooltip,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import {
-  ArrowBack as ArrowBackIcon,
   Edit as EditIcon,
   Save as SaveIcon,
   Person as PersonIcon,
@@ -43,7 +33,6 @@ import {
   Camera as CameraIcon,
   CalendarMonth as CalendarIcon,
 } from '@mui/icons-material';
-import { useHistory } from 'react-router-dom';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 
@@ -153,20 +142,8 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-interface UserProfile {
-  id?: string;
-  full_name: string;
-  date_of_birth: string | null;
-  marketing_email: boolean;
-  marketing_notifications: boolean;
-  avatar_url?: string;
-  email?: string;
-  updated_at?: string;
-}
-
 const ProfilePage: React.FC = () => {
   const { profile, user, updateUserInContext } = useUserContext();
-  const history = useHistory();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

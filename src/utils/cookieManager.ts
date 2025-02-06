@@ -1,5 +1,3 @@
-import { clarityManager } from './clarityManager';
-
 export type ConsentCategory = {
   id: string;
   name: string;

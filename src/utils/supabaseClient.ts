@@ -105,8 +105,6 @@ class RequestQueue {
   }
 }
 
-const requestQueue = new RequestQueue();
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,

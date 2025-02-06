@@ -12,7 +12,6 @@ import {
   Switch,
   Paper,
   Snackbar,
-  Alert,
   Stack,
   Slide,
 } from '@mui/material';

@@ -1,12 +1,10 @@
-import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
-import { BrowserRouter as Router, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Box, Container } from '@mui/material';
+import { Redirect, RouteComponentProps } from 'react-router-dom';
 import { 
-  ThemeProvider, 
   CssBaseline, 
-  Box, 
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
   Grid,
   Card,
@@ -19,12 +17,10 @@ import {
   Notifications as NotificationsIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import { theme } from './theme/theme';
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProvider } from './contexts/UserContext';
 import { useTheme } from './contexts/ThemeContext';
-import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { cookieManager } from './utils/cookieManager';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -59,13 +55,6 @@ const queryClient = new QueryClient({
 });
 
 const drawerWidth = 240;
-
-const mainNavItems = [
-  { text: 'Home', icon: <HomeIcon />, path: '/home' },
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Search', icon: <SearchIcon />, path: '/search' },
-  { text: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
-];
 
 interface CheckoutLocationState {
   selectedPlan: Plan;

@@ -7,10 +7,6 @@ interface ImportMetaEnv {
   PROD: boolean;
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
-
 export const initSentry = () => {
   const dsn = import.meta.env.VITE_SENTRY_DSN;
   if (dsn) {
