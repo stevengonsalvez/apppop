@@ -90,7 +90,7 @@ const StoriesPage: React.FC = () => {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const history = useHistory();
-  const theme = useTheme();
+  const _theme = useTheme();
 
   const currentStory = mockStories[currentStoryIndex];
   const storyDuration = currentStory?.duration || 5000;

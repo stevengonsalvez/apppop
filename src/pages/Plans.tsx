@@ -19,21 +19,11 @@ import { usePlans } from '../hooks/usePlans';
 import { useUserPlan } from '../hooks/useUserPlan';
 import { BillingPeriod, Addon, Plan } from '../types/plan';
 import { useUserContext } from '../contexts/UserContext';
-import { supabase } from '../utils/supabaseClient';
+import { useHistory } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useHistory } from 'react-router-dom';
 
 type TabValue = 'yourplan' | 'chooseplan' | 'addons';
-
-const ActivityType = {
-  PLAN_CHANGED: 'plan_changed'
-} as const;
-
-// Placeholder for activity tracking
-const trackActivity = async (type: string, data: Record<string, unknown>) => {
-  console.log('Activity tracked:', type, data);
-};
 
 const PlanCard: React.FC<{
   plan: Plan;
@@ -143,8 +133,8 @@ const AddonCard: React.FC<{
 
 const Plans: React.FC = () => {
   const { data: planData } = usePlans();
-  const { data: userPlan, isLoading: isUserPlanLoading } = useUserPlan();
-  const { user } = useUserContext();
+  const { data: userPlan, isLoading: _isUserPlanLoading } = useUserPlan();
+  const { user: _user } = useUserContext();
   const history = useHistory();
   
   const [activeTab, setActiveTab] = useState<TabValue>('yourplan');
@@ -176,14 +166,12 @@ const Plans: React.FC = () => {
     filteredPlans,
     filteredAddons,
     includedAddonsByPlan,
-    allowedAddonsByPlan,
   } = useMemo(() => {
     if (!planData) {
       return {
         filteredPlans: [],
         filteredAddons: [],
         includedAddonsByPlan: new Map(),
-        allowedAddonsByPlan: new Map(),
       };
     }
 
@@ -193,7 +181,6 @@ const Plans: React.FC = () => {
     const filteredAddons = addons.filter(a => a.billing_period === billingPeriod);
 
     const includedAddonsByPlan = new Map();
-    const allowedAddonsByPlan = new Map();
 
     filteredPlans.forEach(plan => {
       const included = filteredAddons.filter(addon =>
@@ -204,22 +191,12 @@ const Plans: React.FC = () => {
         )
       );
       includedAddonsByPlan.set(plan.id, included);
-
-      const allowed = filteredAddons.filter(addon =>
-        planAddons.some(pa =>
-          pa.plan_id === plan.id &&
-          pa.addon_id === addon.id &&
-          pa.allowed
-        )
-      );
-      allowedAddonsByPlan.set(plan.id, allowed);
     });
 
     return {
       filteredPlans,
       filteredAddons,
       includedAddonsByPlan,
-      allowedAddonsByPlan,
     };
   }, [planData, billingPeriod]);
 
@@ -234,11 +211,6 @@ const Plans: React.FC = () => {
       planData.addons.find(a => a.id === addonId)
     ).filter(Boolean);
   }, [currentAddons, planData]);
-
-  const includedAddonsForCurrentPlan = useMemo(() => {
-    if (!currentPlan) return [];
-    return includedAddonsByPlan.get(currentPlan) || [];
-  }, [currentPlan, includedAddonsByPlan]);
 
   const selectedPlanDetails = useMemo(() => {
     if (!selectedPlan || !planData) return null;

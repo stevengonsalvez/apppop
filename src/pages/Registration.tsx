@@ -58,7 +58,7 @@ export const RegistrationPage: React.FC = () => {
   const [state, setState] = useState<RegistrationState>(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{message: string, open: boolean}>({ message: '', open: false });
   const history = useHistory();
 

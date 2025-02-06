@@ -1,0 +1,106 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:jsx-a11y/recommended",
+    "prettier"
+  ],
+  "globals": {
+    "React": true,
+    "Deno": true,
+    "ImportMeta": true,
+    "ActiveXObject": true,
+    "System": true,
+    "importScripts": true,
+    "Bun": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "import",
+    "jsx-a11y"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "rules": {
+    // Critical rules - Must Fix
+    "no-async-promise-executor": "error",
+    "react/no-unknown-property": "error",
+    "no-prototype-builtins": "error",
+    "no-unsafe-finally": "error",
+    "react/jsx-key": "error",
+    "no-undef": "error",
+    "no-case-declarations": "error",
+
+    // Important rules - Should Fix (Warnings)
+    "react/no-find-dom-node": "warn",
+    "react/no-deprecated": "warn",
+    "prefer-const": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
+    "no-empty": ["warn", { "allowEmptyCatch": true }],
+    "import/no-duplicates": "warn",
+    "no-constant-condition": "warn",
+    "no-fallthrough": "warn",
+    "jsx-a11y/alt-text": "warn",
+    "jsx-a11y/anchor-is-valid": "warn",
+
+    // Safe to disable or necessary for development
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-types": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "import/no-unresolved": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "no-useless-escape": "off",
+    "react/display-name": "off",
+    "react/no-unescaped-entities": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off"
+  },
+  "ignorePatterns": [
+    "dist/*", 
+    "node_modules/*",
+    "android/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.d.ts",
+    "*.config.js",
+    "*.config.ts"
+  ]
+} 

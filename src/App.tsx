@@ -1,30 +1,15 @@
-import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
-import { BrowserRouter as Router, useHistory } from 'react-router-dom';
-import { 
-  ThemeProvider, 
-  CssBaseline, 
-  Box, 
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Grid,
-  Card,
-  CardContent,
-} from '@mui/material';
-import { 
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  Dashboard as DashboardIcon,
-  Notifications as NotificationsIcon,
-  Search as SearchIcon,
-} from '@mui/icons-material';
+import { BrowserRouter as Router, Route, Redirect, useHistory, RouteComponentProps } from 'react-router-dom';
+import { Box, CssBaseline, AppBar, Toolbar, IconButton } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { theme } from './theme/theme';
+import MenuIcon from '@mui/icons-material/Menu';
+import { tagManager } from './utils/tagManager';
+import './theme/variables.css';
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProvider } from './contexts/UserContext';
 import { useTheme } from './contexts/ThemeContext';
-import { CookieConsentBanner } from './components/CookieConsentBanner';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { cookieManager } from './utils/cookieManager';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -32,17 +17,12 @@ import { supabase } from './utils/supabaseClient';
 import { LeftDrawer } from './components/LeftDrawer';
 import { BottomNav } from './components/BottomNav';
 import { InteractiveLogo } from './components/InteractiveLogo';
-import { tagManager } from './utils/tagManager';
-
-import './theme/variables.css';
-
 import { LoginPage } from './pages/Login';
 import { RegistrationPage } from './pages/Registration';
 import ProfilePage from './pages/Profile';
 import { LandingPage } from './pages/Landing';
 import PlansPage from './pages/Plans';
 import TimelinePage from './pages/Timeline';
-import { ThemeProvider as NewThemeProvider } from './contexts/ThemeContext';
 import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
@@ -60,13 +40,6 @@ const queryClient = new QueryClient({
 
 const drawerWidth = 240;
 
-const mainNavItems = [
-  { text: 'Home', icon: <HomeIcon />, path: '/home' },
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Search', icon: <SearchIcon />, path: '/search' },
-  { text: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
-];
-
 interface CheckoutLocationState {
   selectedPlan: Plan;
   selectedAddons: Addon[];
@@ -80,6 +53,7 @@ const CheckoutRoute: React.FC<RouteComponentProps<{}, {}, CheckoutLocationState>
 );
 
 const AuthenticatedApp: React.FC = () => {
+  // @ts-ignore
   const history = useHistory();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bottomNavValue, setBottomNavValue] = useState(0);
@@ -262,17 +236,19 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <NewThemeProvider>
-      <CssBaseline />
-      <QueryClientProvider client={queryClient}>
-        <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
-          <Router>
-            <AppContent />
-          </Router>
-        </Box>
-        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
-      </QueryClientProvider>
-    </NewThemeProvider>
+    <MuiThemeProvider theme={theme}>
+      <ThemeProvider>
+        <CssBaseline />
+        <QueryClientProvider client={queryClient}>
+          <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
+            <Router>
+              <AppContent />
+            </Router>
+          </Box>
+          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+        </QueryClientProvider>
+      </ThemeProvider>
+    </MuiThemeProvider>
   );
 };
 

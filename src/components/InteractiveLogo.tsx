@@ -13,7 +13,6 @@ import {
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
   Star as StarIcon,
-  FiberManualRecord as DotIcon
 } from '@mui/icons-material';
 import { useHistory } from 'react-router-dom';
 

@@ -2,12 +2,11 @@
 
 import { execSync } from 'child_process';
 import { mkdir, writeFile, readFile } from 'fs/promises';
-import { join } from 'path';
+import { join , dirname } from 'path';
 import { createInterface } from 'readline';
 import chalk from 'chalk';
 import ora from 'ora';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { glob } from 'glob';
 
 const __filename = fileURLToPath(import.meta.url);

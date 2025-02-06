@@ -2,34 +2,26 @@ import { useState, useEffect } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import { supabase } from '../utils/supabaseClient';
 import { cookieManager } from '../utils/cookieManager';
-import { trackProfileUpdate } from '../utils/activity';
 import { tagManager } from '../utils/tagManager';
+import { trackProfileUpdate } from '../utils/activity';
 import {
-  AppBar,
-  Toolbar,
   IconButton,
   Typography,
   Box,
   Avatar,
   TextField,
-  Paper,
-  Switch,
-  Button,
   Stack,
   Container,
-  FormControlLabel,
-  Divider,
-  Card,
-  CardContent,
   ToggleButton,
   ToggleButtonGroup,
   styled,
   alpha,
   Tooltip,
   CircularProgress,
+  Button,
+  Card,
 } from '@mui/material';
 import {
-  ArrowBack as ArrowBackIcon,
   Edit as EditIcon,
   Save as SaveIcon,
   Person as PersonIcon,
@@ -43,7 +35,6 @@ import {
   Camera as CameraIcon,
   CalendarMonth as CalendarIcon,
 } from '@mui/icons-material';
-import { useHistory } from 'react-router-dom';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 
@@ -153,23 +144,13 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-interface UserProfile {
-  id?: string;
-  full_name: string;
-  date_of_birth: string | null;
-  marketing_email: boolean;
-  marketing_notifications: boolean;
-  avatar_url?: string;
-  email?: string;
-  updated_at?: string;
-}
-
 const ProfilePage: React.FC = () => {
   const { profile, user, updateUserInContext } = useUserContext();
-  const history = useHistory();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [privacyEnabled, setPrivacyEnabled] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     full_name: profile?.full_name || '',
     date_of_birth: profile?.date_of_birth ? new Date(profile.date_of_birth) : null,
@@ -199,35 +180,39 @@ const ProfilePage: React.FC = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.from('profiles').upsert({
+      const updatedProfile = {
         id: user.id,
         full_name: editedProfile.full_name,
         date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
         marketing_email: editedProfile.marketing_email,
         marketing_notifications: editedProfile.marketing_notifications,
         updated_at: new Date().toISOString(),
-      });
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updatedProfile);
 
       if (error) throw error;
 
-      // Track which fields were updated
-      const updatedFields = Object.keys(editedProfile).filter(key => 
-        editedProfile[key as keyof typeof editedProfile] !== profile?.[key as keyof typeof profile]
-      );
+      // Track changes by comparing with previous profile
+      const changedFields = Object.entries(updatedProfile).reduce((acc, [key, value]) => {
+        if (profile?.[key as keyof typeof profile] !== value) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
 
-      tagManager.pushEvent('profile_update', {
-        updated_fields: updatedFields,
-        marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications
-      });
+      // Only track if there are actual changes
+      if (Object.keys(changedFields).length > 0) {
+        await trackProfileUpdate(changedFields);
+      }
 
       // Update local state
       updateUserInContext({
         ...profile!,
-        full_name: editedProfile.full_name,
-        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0],
-        marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications,
+        full_name: updatedProfile.full_name,
+        date_of_birth: updatedProfile.date_of_birth || undefined,
+        marketing_email: updatedProfile.marketing_email,
+        marketing_notifications: updatedProfile.marketing_notifications,
       });
 
       setIsEditing(false);
@@ -241,6 +226,40 @@ const ProfilePage: React.FC = () => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleNotificationChange = async (newValue: boolean) => {
+    await updateNotificationPreferences(newValue);
+    setNotificationEnabled(newValue);
+  };
+
+  const handlePrivacyChange = async (newValue: boolean) => {
+    await updatePrivacyPreferences(newValue);
+    setPrivacyEnabled(newValue);
+  };
+
+  const updateNotificationPreferences = async (enabled: boolean) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('profiles').update({
+        notification_enabled: enabled,
+      }).eq('id', user.id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+    }
+  };
+
+  const updatePrivacyPreferences = async (enabled: boolean) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('profiles').update({
+        privacy_enabled: enabled,
+      }).eq('id', user.id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating privacy preferences:', error);
     }
   };
 

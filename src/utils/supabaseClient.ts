@@ -40,7 +40,7 @@ class CircuitBreaker {
 const circuitBreaker = new CircuitBreaker();
 
 // Request queue implementation
-class RequestQueue {
+class _RequestQueue {
   private queue: Array<() => Promise<any>> = [];
   private processing = false;
   private maxConcurrent = 3;
@@ -104,8 +104,6 @@ class RequestQueue {
     }
   }
 }
-
-const requestQueue = new RequestQueue();
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

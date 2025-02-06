@@ -42,7 +42,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ value, onChange, onNavigat
           bgcolor: 'background.paper',
         }}
       >
-        {navItems.map((item, index) => (
+        {navItems.map((item, _index) => (
           <BottomNavigationAction
             key={item.label}
             icon={item.icon}
