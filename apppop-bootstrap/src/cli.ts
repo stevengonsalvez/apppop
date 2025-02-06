@@ -640,7 +640,7 @@ const showFinalInstructions = (projectDir: string, setupOptions: SetupOptions): 
     console.log('  - Primary and secondary font families');
   }
 
-  console.log(chalk.bold('\nHappy coding! 🎉'));
+  console.log(chalk.bold('\nHappy coding! 🎉 🎉 🎉'));
 };
 
 const main = async (): Promise<void> => {
