@@ -2,6 +2,11 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/create-apppop-app.svg)](https://www.npmjs.com/package/create-apppop-app)
+[![DeepSource](https://app.deepsource.com/gh/stevengonsalvez/apppop.svg/?label=code+coverage&show_trend=true&token=SA1e3xQfwYIRm8uI4Wuw32hM)](https://app.deepsource.com/gh/stevengonsalvez/apppop/)
+[![DeepSource](https://app.deepsource.com/gh/stevengonsalvez/apppop.svg/?label=resolved+issues&show_trend=true&token=SA1e3xQfwYIRm8uI4Wuw32hM)](https://app.deepsource.com/gh/stevengonsalvez/apppop/)
+
+</br>
+
 [![Supabase](https://img.shields.io/badge/Supabase-2.x-green.svg)](https://supabase.io/)
 [![Material-UI](https://img.shields.io/badge/MUI-5.x-purple.svg)](https://mui.com/)
 [![Capacitor](https://img.shields.io/badge/Capacitor-5.x-blue.svg)](https://capacitorjs.com/)
