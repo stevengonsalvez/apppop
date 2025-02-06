@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, afterAll } from 'vitest';
 import { TextEncoder, TextDecoder } from 'util';
 
 // Setup globals that might be needed
