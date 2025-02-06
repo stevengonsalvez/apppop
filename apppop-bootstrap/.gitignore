@@ -1,0 +1,61 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/test-results
+/playwright-report
+unit-test-results.txt
+.lighthouseci
+
+# Production
+/dist
+
+# IDE and OS files
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local.local
+/.nx
+/.nx/cache
+/.vscode/*
+!/.vscode/extensions.json
+.idea
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.eslintcache
+.env
+
+# Environment files
+.env.test
+.env.development
+.env.production
+
+# Supabase
+/supabase/.temp
+/supabase/.branches
+/supabase/.env
+
+# iOS
+/ios/App/build
+/ios/App/Pods
+/ios/App/output
+/ios/App/App/public
+/ios/DerivedData
+/ios/xcuserdata
+
+# Android
+/android
+
+# Sentry Config File
+.env.sentry-build-plugin
+config/gtm-credentials.json

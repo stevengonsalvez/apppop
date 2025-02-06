@@ -35,15 +35,7 @@ VITE_APP_SUPABASE_ANON_KEY=your-anon-key
 3. Configure Authentication:
    - Go to Authentication > Settings
    - Configure Email & OAuth providers
-   - Set up Row Level Security (RLS)\
-
-#### Run supabase sql scripts
-
-```bash
-supabase sql -f ./supabase/sql/01_create_tables.sql
-```
- or alternatively within supabase dashboard run the scripts
-
+   - Set up Row Level Security (RLS)
 
 For detailed authentication setup, see [Authentication Guide](./auth.md).
 
@@ -53,8 +45,6 @@ Configure these features as needed:
 
 - [🔍 Google Tag Manager Setup](./gtm-setup.md)
 - [📊 Google Analytics Integration](./GoogleAnalytics.md)
-  - [Google Tag Manager Setup](./gtm-setup.md)
-  - [google tag manager usage guide](./gtm-usage-guide.md)
 - [📈 Application Monitoring](./monitoring.md)
 - [🔥 Heatmap Analytics](./heatmap.md)
 - [🍪 Cookie Consent](./cookieconsent.md)

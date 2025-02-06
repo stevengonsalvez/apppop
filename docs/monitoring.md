@@ -42,14 +42,27 @@ npx @sentry/wizard@latest -i sourcemaps --saas
 3. Required CI/CD Environment Variables:
 ```env
 SENTRY_AUTH_TOKEN=your-auth-token
+SENTRY_ORG=your-org-name
+SENTRY_PROJECT=your-project-name
 ```
 
-4. Source maps enabled in `vite.config.ts`:
+4. Source maps configuration in `vite.config.ts`:
 ```typescript
+sentryVitePlugin({
+  org: process.env.SENTRY_ORG || "default-org",
+  project: process.env.SENTRY_PROJECT || "default-project",
+  telemetry: false  // Disable sending telemetry data to Sentry
+}),
+
 build: {
   sourcemap: true
 }
 ```
+
+The configuration supports:
+- Loading organization and project names from environment variables
+- Disabling telemetry data collection
+- Fallback values if environment variables are not set
 
 #### Validation
 
@@ -97,7 +110,7 @@ Transaction sampling rate is set to 1.0 (100%). Adjust `tracesSampleRate` in sen
 
 ### Disabling Sentry
 
-Two ways to disable Sentry:
+There are several ways to disable Sentry:
 
 1. Clear DSN in environment:
 ```env
@@ -109,6 +122,40 @@ VITE_SENTRY_DSN=
 export const initSentry = () => {
   // Disabled
   return;
+};
+```
+
+3. Disable Sentry during build time:
+   - Use the environment variable:
+     ```bash
+     DISABLE_SENTRY=true npm run build
+     ```
+   - Or use the provided npm script:
+     ```bash
+     npm run build:no-sentry
+     ```
+   This will:
+   - Skip the Sentry plugin during build
+   - Prevent source map uploads
+   - Avoid Sentry organization/project configuration issues
+
+The build-time disabling is configured in `vite.config.ts`:
+```typescript
+const getPlugins = () => {
+  const plugins = [react(), legacy()];
+  
+  // Only include Sentry plugin if DISABLE_SENTRY is not set
+  if (process.env.DISABLE_SENTRY !== 'true') {
+    plugins.push(
+      sentryVitePlugin({
+        org: process.env.SENTRY_ORG || "self-axx",
+        project: process.env.SENTRY_PROJECT || "self",
+        telemetry: false
+      })
+    );
+  }
+  
+  return plugins;
 };
 ```
 
