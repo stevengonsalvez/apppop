@@ -347,35 +347,44 @@ export const configureSupabase = async (): Promise<SupabaseConfig> => {
 export const cloneTemplate = (projectDir: string): void => {
   const spinner = ora('Cloning template repository...').start();
   try {
-    execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
-      stdio: ['ignore', 'pipe', 'pipe'],
+    const cloneResult = execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
+      stdio: 'pipe',
       encoding: 'utf-8',
     });
 
     process.chdir(projectDir);
 
-    const tenantReadmePath = join(__dirname, '..', 'tenant_readme.md');
-    const setupPath = join(__dirname, '..', 'setup.md');
+    // Copy files from the template repository itself
+    try {
+      execSync('cp docs/setup-template.md docs/setup.md', { stdio: 'pipe' });
+      execSync('cp README-template.md README.md', { stdio: 'pipe' });
+    } catch (copyError) {
+      console.warn(chalk.yellow('\nWarning: Could not copy template files. Using defaults.'));
+      // Create minimal README if template copy fails
+      execSync('echo "# New AppPop Project\n\nCreated with AppPop Bootstrap" > README.md', { stdio: 'pipe' });
+      execSync('mkdir -p docs && echo "# Setup Guide\n\nSetup instructions will be added here." > docs/setup.md', { stdio: 'pipe' });
+    }
 
-    execSync(`cp ${tenantReadmePath} README.md`, { stdio: 'ignore' });
-    execSync(`cp ${setupPath} docs/setup.md`, { stdio: 'ignore' });
-
-    execSync('rm -rf .git', { stdio: 'ignore' });
-    execSync('rm -rf .claudesync', { stdio: 'ignore' });
+    execSync('rm -rf .git', { stdio: 'pipe' });
+    execSync('rm -rf .claudesync', { stdio: 'pipe' });
     spinner.succeed('Template repository cloned and cleaned');
   } catch (error) {
     spinner.fail('Failed to clone template');
     if (error instanceof Error) {
       console.error(chalk.red('\nError details:'));
       // @ts-expect-error execSync error has stderr property
-      if (error.stderr) console.error(chalk.yellow(error.stderr));
+      if (error.stderr) console.error(chalk.yellow(error.stderr.toString()));
       // @ts-expect-error execSync error has stdout property
-      if (error.stdout) console.error(chalk.yellow(error.stdout));
+      if (error.stdout) console.error(chalk.yellow(error.stdout.toString()));
+      console.error(chalk.red(`\nError message: ${error.message}`));
     }
+
     console.error(chalk.cyan('\nPossible solutions:'));
     console.error(chalk.dim('1. Check if the repository exists: ' + TEMPLATE_REPO));
     console.error(chalk.dim('2. Check your internet connection'));
-    console.error(chalk.dim('3. Check if the target directory already exists'));
+    console.error(chalk.dim('3. Check if git is properly configured'));
+    console.error(chalk.dim('4. Check if the target directory is empty: ' + projectDir));
+    console.error(chalk.dim('5. Check if you have write permissions in the target directory'));
     process.exit(1);
   }
 };
