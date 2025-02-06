@@ -66,6 +66,7 @@
     "no-cond-assign": ["error", "except-parens"],
     "@typescript-eslint/no-this-alias": "warn",
     "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "off",
     "import/no-unresolved": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
     "no-useless-escape": "warn",

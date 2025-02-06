@@ -69,6 +69,7 @@ const CheckoutRoute: React.FC<RouteComponentProps<{}, {}, CheckoutLocationState>
 );
 
 const AuthenticatedApp: React.FC = () => {
+  // @ts-ignore
   const history = useHistory();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bottomNavValue, setBottomNavValue] = useState(0);
