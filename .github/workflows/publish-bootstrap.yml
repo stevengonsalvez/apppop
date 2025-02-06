@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'apppop-bootstrap/**'
+      - '.github/workflows/publish-bootstrap.yml'
 
 permissions:
   contents: write
@@ -85,26 +86,10 @@ jobs:
           fi
           
           echo "bump=$BUMP" >> $GITHUB_OUTPUT
-
-      - name: Generate Changelog
-        run: |
-          # Get commit messages since last tag
-          echo "## What's Changed" > CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"* %s (%h)" >> CHANGELOG.md
-          
-          # Add changelog to git
-          git add CHANGELOG.md
-          git commit -m "docs: update changelog [skip ci]"
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         
       - name: Version and Publish
         run: |
           npm version ${{ steps.version.outputs.bump }} -m "chore(bootstrap): bump version to %s [skip ci]"
-          # Add generated files to git
-          git add .
-          git commit --amend --no-edit
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
