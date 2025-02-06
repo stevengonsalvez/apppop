@@ -33,26 +33,26 @@ const checkPrerequisites = (): void => {
   }
 };
 
-interface ProjectConfig {
+export interface ProjectConfig {
   projectName: string;
   projectDir: string;
   setupOptions: SetupOptions;
 }
 
-interface SetupOptions {
+export interface SetupOptions {
   includeSupabase: boolean;
   includeAnalytics: boolean;
   includeThemeSystem: boolean;
   includeErrorTracking: boolean;
 }
 
-interface SupabaseConfig {
+export interface SupabaseConfig {
   supabaseUrl: string;
   supabaseAnonKey: string;
   supabaseProjectId: string;
 }
 
-const validateSupabaseUrl = (url: string): boolean => {
+export const validateSupabaseUrl = (url: string): boolean => {
   const urlPattern = /^https:\/\/[a-z0-9-]+\.supabase\.co$/;
   if (!urlPattern.test(url)) {
     console.log(chalk.red('\n⚠️  Warning: The Supabase URL format appears incorrect'));
@@ -63,7 +63,7 @@ const validateSupabaseUrl = (url: string): boolean => {
   return true;
 };
 
-const validateSupabaseKey = (key: string): boolean => {
+export const validateSupabaseKey = (key: string): boolean => {
   const keyPattern = /^eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
   if (!keyPattern.test(key)) {
     console.log(chalk.red('\n⚠️  Warning: The anon key format appears incorrect'));
@@ -74,7 +74,7 @@ const validateSupabaseKey = (key: string): boolean => {
   return true;
 };
 
-const validateProjectId = (id: string): boolean => {
+export const validateProjectId = (id: string): boolean => {
   const idPattern = /^[a-zA-Z0-9]{20,}$/;
   if (!idPattern.test(id)) {
     console.log(chalk.red('\n⚠️  Warning: The project ID format appears incorrect'));
@@ -119,7 +119,7 @@ const getSetupOptions = async (): Promise<SetupOptions> => {
   return answers;
 };
 
-const createProjectStructure = async (): Promise<ProjectConfig> => {
+export const createProjectStructure = async (): Promise<ProjectConfig> => {
   console.log(chalk.bold('\n1. Project Configuration'));
 
   const projectAnswers = await inquirer.prompt([
@@ -152,7 +152,7 @@ const createProjectStructure = async (): Promise<ProjectConfig> => {
   }
 };
 
-const configureSupabase = async (): Promise<SupabaseConfig> => {
+export const configureSupabase = async (): Promise<SupabaseConfig> => {
   console.log(chalk.bold('\n2. Supabase Configuration'));
   console.log(
     chalk.yellow(
@@ -344,7 +344,7 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
   return { supabaseUrl, supabaseAnonKey, supabaseProjectId };
 };
 
-const cloneTemplate = (projectDir: string): void => {
+export const cloneTemplate = (projectDir: string): void => {
   const spinner = ora('Cloning template repository...').start();
   try {
     execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
@@ -459,7 +459,7 @@ const updateProjectFiles = async (
   }
 };
 
-const setupEnvironment = async (
+export const setupEnvironment = async (
   projectName: string,
   setupOptions: SetupOptions,
   supabaseConfig?: SupabaseConfig
