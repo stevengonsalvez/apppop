@@ -156,47 +156,177 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
   console.log(chalk.bold('\n2. Supabase Configuration'));
   console.log(chalk.yellow('\nPlease create a new Supabase project at https://app.supabase.com if you haven\'t already.'));
   
-  const answers = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'supabaseUrl',
-      message: 'Enter Supabase Project URL:',
-      default: 'https://your-project.supabase.co',
-      validate: (input: string) => {
-        const isValid = validateSupabaseUrl(input);
-        if (!isValid) {
-          return 'Please enter a valid Supabase URL';
-        }
-        return true;
-      }
-    },
-    {
-      type: 'input',
-      name: 'supabaseAnonKey',
-      message: 'Enter Supabase Anon Key:',
-      validate: (input: string) => {
-        const isValid = validateSupabaseKey(input);
-        if (!isValid) {
-          return 'Please enter a valid Supabase anon key';
-        }
-        return true;
-      }
-    },
-    {
-      type: 'input',
-      name: 'supabaseProjectId',
-      message: 'Enter Supabase Project ID:',
-      validate: (input: string) => {
-        const isValid = validateProjectId(input);
-        if (!isValid) {
-          return 'Please enter a valid Supabase project ID';
-        }
-        return true;
-      }
-    }
-  ]);
+  // ASCII diagram for the Supabase dashboard
+  console.log(chalk.cyan('\nSupabase Dashboard Navigation:'));
+  console.log(chalk.dim(`
+    +------------------------------------------------------+
+    |   ${chalk.cyan('Supabase Dashboard')}                                 |
+    +------------------------------------------------------+
+    | Project: MyProject                   [Switch Project] |
+    |------------------------------------------------------|
+    |                                                      |
+    | [🏠] Home        [⚙️] Settings    [?] Help           |
+    |                                                      |
+    | Navigation                      Project Settings      |
+    | ├─ Table Editor                 ├─ General           |
+    | ├─ Authentication              >├─ API              |
+    | ├─ Storage                     >├─ Database         |
+    | ├─ Edge Functions              >└─ Authentication   |
+    | └─ SQL Editor                                       |
+    |                                                      |
+    +------------------------------------------------------+
+  `));
 
-  return answers;
+  console.log(chalk.cyan('\n1. Project URL:'));
+  console.log('   • Open your project in Supabase dashboard');
+  console.log('   • Go to Project Settings (⚙️ icon in top navigation)');
+  console.log('   • Look under "Project Configuration" -> "Project URL"');
+  
+  // ASCII diagram for Project URL location
+  console.log(chalk.dim(`
+    +------------------------------------------------------+
+    |   ${chalk.cyan('Project Settings > Project Configuration')}           |
+    +------------------------------------------------------+
+    | ${chalk.yellow('Project Configuration')}                                  |
+    |------------------------------------------------------|
+    | Project Name: MyProject                               |
+    |                                                      |
+    | ${chalk.green('Project URL:')}                                          |
+    | ${chalk.green('[https://xxx.supabase.co]')}  [📋 Copy]                 |
+    |                                                      |
+    | Region: West US 2 (Washington)                       |
+    |                                                      |
+    | Database Password: ********                          |
+    |                                                      |
+    +------------------------------------------------------+
+  `));
+  
+  let supabaseUrl;
+  do {
+    try {
+      const answer = await inquirer.prompt([{
+        type: 'input',
+        name: 'url',
+        message: 'Enter Supabase Project URL:',
+        default: 'https://your-project-url.supabase.co',
+        validate: (input: string) => {
+          const isValid = validateSupabaseUrl(input);
+          if (!isValid) {
+            return 'Please enter a valid Supabase URL';
+          }
+          return true;
+        }
+      }]);
+      supabaseUrl = answer.url;
+      break;
+    } catch (error) {
+      console.error('Error during input:', error);
+    }
+  } while (true);
+
+  console.log(chalk.cyan('\n2. Anon/Public Key:'));
+  console.log('   • Stay in Project Settings');
+  console.log('   • Go to "API" section in the sidebar');
+  console.log('   • Look under "Project API keys"');
+  console.log('   • Copy the "anon public" key (NOT the service_role key!)');
+  
+  // ASCII diagram for API key location
+  console.log(chalk.dim(`
+    +------------------------------------------------------+
+    |   ${chalk.cyan('Project Settings > API')}                              |
+    +------------------------------------------------------+
+    | ${chalk.yellow('Project API Keys')}                                     |
+    |------------------------------------------------------|
+    | These keys are safe to use in a browser if you've    |
+    | configured Row Level Security (RLS).                  |
+    |                                                      |
+    | ${chalk.green('Project API Keys')}                                     |
+    | ┌────────────────────────────────────────┐          |
+    | │ anon public                            │          |
+    | │ ${chalk.green('eyJhbG...')}                    [📋 Copy] │          |
+    | └────────────────────────────────────────┘          |
+    |                                                      |
+    | ${chalk.red('⚠️  Secret Keys (DO NOT SHARE!)')}                       |
+    | ┌────────────────────────────────────────┐          |
+    | │ service_role                           │          |
+    | │ ey********                     [Show]  │          |
+    | └────────────────────────────────────────┘          |
+    +------------------------------------------------------+
+  `));
+
+  let supabaseAnonKey;
+  do {
+    try {
+      const answer = await inquirer.prompt([{
+        type: 'input',
+        name: 'key',
+        message: 'Enter Supabase Anon Key:',
+        default: 'your-anon-key',
+        validate: (input: string) => {
+          const isValid = validateSupabaseKey(input);
+          if (!isValid) {
+            return 'Please enter a valid Supabase anon key';
+          }
+          return true;
+        }
+      }]);
+      supabaseAnonKey = answer.key;
+      break;
+    } catch (error) {
+      console.error('Error during input:', error);
+    }
+  } while (true);
+
+  console.log(chalk.cyan('\n3. Project ID:'));
+  console.log('   • Go to "General" settings in the sidebar');
+  console.log('   • Find "Reference ID" under Project Settings');
+  console.log('   • This is used for CLI configuration and API access');
+  
+  // ASCII diagram for Project ID location
+  console.log(chalk.dim(`
+    +------------------------------------------------------+
+    |   ${chalk.cyan('Project Settings > General')}                          |
+    +------------------------------------------------------+
+    | ${chalk.yellow('General Settings')}                                     |
+    |------------------------------------------------------|
+    | Project Info                                         |
+    | ├─ Name: MyProject                                  |
+    | ├─ Region: West US 2                                |
+    | │                                                   |
+    | ${chalk.green('Reference ID (Project ID)')}                            |
+    | ├─ ${chalk.green('abcdef123456789...')}                [📋 Copy]       |
+    | │                                                   |
+    | Database                                           |
+    | ├─ Host: db.xxx.supabase.co                       |
+    | ├─ Password: ********                              |
+    | └─ Port: 5432                                      |
+    +------------------------------------------------------+
+  `));
+
+  let supabaseProjectId;
+  do {
+    try {
+      const answer = await inquirer.prompt([{
+        type: 'input',
+        name: 'id',
+        message: 'Enter Supabase Project ID:',
+        default: 'your-project-id',
+        validate: (input: string) => {
+          const isValid = validateProjectId(input);
+          if (!isValid) {
+            return 'Please enter a valid Supabase project ID';
+          }
+          return true;
+        }
+      }]);
+      supabaseProjectId = answer.id;
+      break;
+    } catch (error) {
+      console.error('Error during input:', error);
+    }
+  } while (true);
+
+  return { supabaseUrl, supabaseAnonKey, supabaseProjectId };
 };
 
 const cloneTemplate = (projectDir: string): void => {
