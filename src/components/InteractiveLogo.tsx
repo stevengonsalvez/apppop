@@ -51,10 +51,7 @@ const StyledLogoWrapper = styled('div')(({ theme }) => ({
   },
 }));
 
-const StyledMenu = styled(Menu)((
-  // @ts-ignore
-  { theme }
-) => ({
+const StyledMenu = styled(Menu)(({ theme }) => ({
   '& .MuiPaper-root': {
     borderRadius: 20,
     marginRight: 32,
@@ -94,10 +91,7 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
   },
 }));
 
-const StyledStarIcon = styled(StarIcon)((
-  // @ts-ignore
-  { theme }
-) => ({
+const StyledStarIcon = styled(StarIcon)(({ theme }) => ({
   '&.morph': {
     animation: `${morphAndGlow} 1.5s infinite ease-in-out`,
     fontSize: 28,

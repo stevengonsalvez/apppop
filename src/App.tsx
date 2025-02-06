@@ -1,22 +1,10 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Box, Container } from '@mui/material';
-import { Redirect, RouteComponentProps } from 'react-router-dom';
-import { 
-  CssBaseline, 
-  AppBar,
-  Toolbar,
-  IconButton,
-  Grid,
-  Card,
-  CardContent,
-} from '@mui/material';
-import { 
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  Dashboard as DashboardIcon,
-  Notifications as NotificationsIcon,
-  Search as SearchIcon,
-} from '@mui/icons-material';
+import { BrowserRouter as Router, Route, Redirect, useHistory, RouteComponentProps } from 'react-router-dom';
+import { Box, CssBaseline, AppBar, Toolbar, IconButton } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from './theme/theme';
+import MenuIcon from '@mui/icons-material/Menu';
+import { tagManager } from './utils/tagManager';
+import './theme/variables.css';
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProvider } from './contexts/UserContext';
@@ -28,17 +16,12 @@ import { supabase } from './utils/supabaseClient';
 import { LeftDrawer } from './components/LeftDrawer';
 import { BottomNav } from './components/BottomNav';
 import { InteractiveLogo } from './components/InteractiveLogo';
-import { tagManager } from './utils/tagManager';
-
-import './theme/variables.css';
-
 import { LoginPage } from './pages/Login';
 import { RegistrationPage } from './pages/Registration';
 import ProfilePage from './pages/Profile';
 import { LandingPage } from './pages/Landing';
 import PlansPage from './pages/Plans';
 import TimelinePage from './pages/Timeline';
-import { ThemeProvider as NewThemeProvider } from './contexts/ThemeContext';
 import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
@@ -252,7 +235,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <NewThemeProvider>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
@@ -262,7 +245,7 @@ const App: React.FC = () => {
         </Box>
         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
-    </NewThemeProvider>
+    </ThemeProvider>
   );
 };
 

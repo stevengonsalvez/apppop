@@ -116,7 +116,7 @@ const features: FeatureCard[] = [
 const categories = ['All', 'Core', 'UI/UX', 'Integrations', 'Analytics'];
 
 const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = ({ feature, index }) => {
-  const theme = useTheme();
+  const _theme = useTheme();
   
   const sizeStyles = {
     small: {
@@ -165,7 +165,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
           left: 0,
           right: 0,
           bottom: 0,
-          background: `linear-gradient(to bottom, ${alpha(theme.palette.background.paper, 0.1)}, ${alpha(theme.palette.background.paper, 0.9)})`,
+          background: `linear-gradient(to bottom, ${alpha(_theme.palette.background.paper, 0.1)}, ${alpha(_theme.palette.background.paper, 0.9)})`,
           zIndex: 1,
         },
         ...sizeStyles,
@@ -173,7 +173,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
     >
       <Box sx={{ position: 'relative', zIndex: 2, p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <Box>
-          <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: alpha(theme.palette.background.paper, 0.8), px: 1, py: 0.5, borderRadius: 1, fontSize: '0.7rem' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: alpha(_theme.palette.background.paper, 0.8), px: 1, py: 0.5, borderRadius: 1, fontSize: '0.7rem' }}>
             {feature.type}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
@@ -195,7 +195,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
             variant="body2" 
             sx={{ 
               color: 'white',
-              bgcolor: alpha(theme.palette.background.paper, 0.3),
+              bgcolor: alpha(_theme.palette.background.paper, 0.3),
               px: 1.5,
               py: 0.5,
               borderRadius: 2,
@@ -215,7 +215,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                bgcolor: alpha(theme.palette.background.paper, 0.3),
+                bgcolor: alpha(_theme.palette.background.paper, 0.3),
                 backdropFilter: 'blur(4px)'
               }}
             >
@@ -231,7 +231,7 @@ const FeatureCardComponent: React.FC<{ feature: FeatureCard; index: number }> = 
 };
 
 export const HomePage: React.FC = () => {
-  const theme = useTheme();
+  const _theme = useTheme();
 
   return (
     <Box sx={{ 

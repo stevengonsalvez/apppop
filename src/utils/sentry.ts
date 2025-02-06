@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { browserTracingIntegration, replayIntegration } from "@sentry/react";
 
-interface ImportMetaEnv {
+interface _ImportMetaEnv {
   VITE_SENTRY_DSN: string;
   MODE: string;
   PROD: boolean;

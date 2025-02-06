@@ -1,7 +1,8 @@
 import { createTheme, Theme, alpha } from '@mui/material';
-import { ColorScheme, colorSchemes, createPaletteFromScheme } from './colorScheme';
-import { FontScheme, fontSchemes } from './fontScheme';
+import { ColorScheme } from './colorScheme';
 import { appPopColorScheme } from './colorScheme';
+import { FontScheme, fontSchemes } from './fontScheme';
+import { styled as muiStyled } from '@mui/material/styles';
 
 // Add tertiary to allowed button colors
 declare module '@mui/material/Button' {
@@ -329,4 +330,9 @@ export const createAppTheme = ({
   return theme;
 };
 
-export const theme = createAppTheme(); 
+export const theme = createAppTheme();
+
+export const StyledEngineProvider = muiStyled('div')<{ theme?: Theme }>(({ theme }) => ({
+  backgroundColor: theme?.palette.background.default,
+  minHeight: '100vh',
+})); 

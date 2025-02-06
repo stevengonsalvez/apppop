@@ -133,8 +133,8 @@ const AddonCard: React.FC<{
 
 const Plans: React.FC = () => {
   const { data: planData } = usePlans();
-  const { data: userPlan, isLoading: isUserPlanLoading } = useUserPlan();
-  const { user } = useUserContext();
+  const { data: userPlan, isLoading: _isUserPlanLoading } = useUserPlan();
+  const { user: _user } = useUserContext();
   const history = useHistory();
   
   const [activeTab, setActiveTab] = useState<TabValue>('yourplan');

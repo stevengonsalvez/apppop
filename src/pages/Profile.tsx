@@ -18,6 +18,7 @@ import {
   Tooltip,
   CircularProgress,
   Button,
+  Card,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -147,6 +148,8 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [privacyEnabled, setPrivacyEnabled] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     full_name: profile?.full_name || '',
     date_of_birth: profile?.date_of_birth ? new Date(profile.date_of_birth) : null,
@@ -218,6 +221,40 @@ const ProfilePage: React.FC = () => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleNotificationChange = async (newValue: boolean) => {
+    await updateNotificationPreferences(newValue);
+    setNotificationEnabled(newValue);
+  };
+
+  const handlePrivacyChange = async (newValue: boolean) => {
+    await updatePrivacyPreferences(newValue);
+    setPrivacyEnabled(newValue);
+  };
+
+  const updateNotificationPreferences = async (enabled: boolean) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('profiles').update({
+        notification_enabled: enabled,
+      }).eq('id', user.id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+    }
+  };
+
+  const updatePrivacyPreferences = async (enabled: boolean) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('profiles').update({
+        privacy_enabled: enabled,
+      }).eq('id', user.id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating privacy preferences:', error);
     }
   };
 

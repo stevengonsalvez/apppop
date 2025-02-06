@@ -119,7 +119,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'github') => {
+  const _handleSocialLogin = async (provider: 'google' | 'github') => {
     try {
       tagManager.pushEvent('social_login_start', {
         method: provider,
