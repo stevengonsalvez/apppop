@@ -54,3 +54,4 @@ yarn-error.log*
 
 # Android
 /android
+/apppop-bootstrap
