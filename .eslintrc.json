@@ -94,6 +94,7 @@
   "ignorePatterns": [
     "dist/*", 
     "node_modules/*",
+    "android/*",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
