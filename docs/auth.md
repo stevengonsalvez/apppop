@@ -35,6 +35,47 @@
    ✓ Enable Password Reset
    ```
 
+### **4. Initialize Database Schema**
+
+After setting up authentication, you need to initialize the database schema. You can do this either through the Supabase Dashboard or using the CLI:
+
+#### **Option 1: Using Supabase Dashboard**
+Go to the **SQL Editor** in your Supabase dashboard and execute the following SQL files in order:
+
+1. Create the profiles table:
+   ```sql
+   -- Execute contents of: supabase/sql/00000000000000_create_profiles.sql
+   ```
+
+2. Create the plans and related tables:
+   ```sql
+   -- Execute contents of: supabase/sql/20240321000001_create_plans.sql
+   ```
+
+3. Seed the initial plans data:
+   ```sql
+   -- Execute contents of: supabase/sql/20240321000002_seed_plans.sql
+   ```
+
+#### **Option 2: Using Supabase CLI**
+If you have the Supabase CLI installed, you can run the migrations directly:
+
+```bash
+# Make sure you're logged in and have selected your project
+supabase link --project-ref your-project-ref
+
+# Run all migrations
+supabase db push
+
+# Or run specific migrations
+supabase db reset --db-only  # This will run all migrations from scratch
+```
+
+These SQL files will:
+- Set up the user profiles table with proper RLS policies
+- Create the subscription plans infrastructure
+- Populate initial subscription plans and add-ons
+
 ---
 
 # **Supabase Email Verification & Gmail SMTP Configuration**
@@ -104,7 +145,7 @@ This ensures that users **cannot access data** until their email is verified.
 ---
 
 ## **4. Resend Email Verification (If Needed)**
-If a user hasn’t received a verification email, you can **manually resend it** via the Supabase API.
+If a user hasn't received a verification email, you can **manually resend it** via the Supabase API.
 
 ### **Using Supabase JavaScript API**
 ```javascript

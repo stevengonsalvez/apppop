@@ -568,7 +568,7 @@ const setupSupabaseCLI = (): void => {
   const spinner = ora('Setting up Supabase CLI...').start();
   try {
     execSync('npm install supabase --save-dev', { stdio: 'ignore' });
-    execSync('npx supabase init', { stdio: 'ignore' });
+    execSync('npx supabase init --force', { stdio: 'ignore' });
     spinner.succeed('Supabase CLI setup complete');
   } catch (error) {
     spinner.fail('Failed to setup Supabase CLI');
