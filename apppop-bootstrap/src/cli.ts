@@ -2,15 +2,9 @@
 
 import { execSync } from 'child_process';
 import { mkdir, writeFile, readFile } from 'fs/promises';
-import { join } from 'path';
 import chalk from 'chalk';
 import ora from 'ora';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import inquirer from 'inquirer';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const TEMPLATE_REPO = 'https://github.com/stevengonsalvez/apppop.git';
 
@@ -347,7 +341,7 @@ export const configureSupabase = async (): Promise<SupabaseConfig> => {
 export const cloneTemplate = (projectDir: string): void => {
   const spinner = ora('Cloning template repository...').start();
   try {
-    const cloneResult = execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
+    execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
       stdio: 'pipe',
       encoding: 'utf-8',
     });
@@ -361,8 +355,13 @@ export const cloneTemplate = (projectDir: string): void => {
     } catch (copyError) {
       console.warn(chalk.yellow('\nWarning: Could not copy template files. Using defaults.'));
       // Create minimal README if template copy fails
-      execSync('echo "# New AppPop Project\n\nCreated with AppPop Bootstrap" > README.md', { stdio: 'pipe' });
-      execSync('mkdir -p docs && echo "# Setup Guide\n\nSetup instructions will be added here." > docs/setup.md', { stdio: 'pipe' });
+      execSync('echo "# New AppPop Project\n\nCreated with AppPop Bootstrap" > README.md', {
+        stdio: 'pipe',
+      });
+      execSync(
+        'mkdir -p docs && echo "# Setup Guide\n\nSetup instructions will be added here." > docs/setup.md',
+        { stdio: 'pipe' }
+      );
     }
 
     execSync('rm -rf .git', { stdio: 'pipe' });
