@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Redirect, useHistory, RouteComponentProps } from 'react-router-dom';
 import { Box, CssBaseline, AppBar, Toolbar, IconButton } from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { theme } from './theme/theme';
 import MenuIcon from '@mui/icons-material/Menu';
 import { tagManager } from './utils/tagManager';
@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProvider } from './contexts/UserContext';
 import { useTheme } from './contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { cookieManager } from './utils/cookieManager';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -235,17 +236,19 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <QueryClientProvider client={queryClient}>
-        <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
-          <Router>
-            <AppContent />
-          </Router>
-        </Box>
-        {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
-      </QueryClientProvider>
-    </ThemeProvider>
+    <MuiThemeProvider theme={theme}>
+      <ThemeProvider>
+        <CssBaseline />
+        <QueryClientProvider client={queryClient}>
+          <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
+            <Router>
+              <AppContent />
+            </Router>
+          </Box>
+          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+        </QueryClientProvider>
+      </ThemeProvider>
+    </MuiThemeProvider>
   );
 };
 

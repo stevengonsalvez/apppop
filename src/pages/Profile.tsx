@@ -3,6 +3,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { supabase } from '../utils/supabaseClient';
 import { cookieManager } from '../utils/cookieManager';
 import { tagManager } from '../utils/tagManager';
+import { trackProfileUpdate } from '../utils/activity';
 import {
   IconButton,
   Typography,
@@ -179,35 +180,39 @@ const ProfilePage: React.FC = () => {
     setError(null);
 
     try {
-      const { error } = await supabase.from('profiles').upsert({
+      const updatedProfile = {
         id: user.id,
         full_name: editedProfile.full_name,
         date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0] || null,
         marketing_email: editedProfile.marketing_email,
         marketing_notifications: editedProfile.marketing_notifications,
         updated_at: new Date().toISOString(),
-      });
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updatedProfile);
 
       if (error) throw error;
 
-      // Track which fields were updated
-      const updatedFields = Object.keys(editedProfile).filter(key => 
-        editedProfile[key as keyof typeof editedProfile] !== profile?.[key as keyof typeof profile]
-      );
+      // Track changes by comparing with previous profile
+      const changedFields = Object.entries(updatedProfile).reduce((acc, [key, value]) => {
+        if (profile?.[key as keyof typeof profile] !== value) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
 
-      tagManager.pushEvent('profile_update', {
-        updated_fields: updatedFields,
-        marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications
-      });
+      // Only track if there are actual changes
+      if (Object.keys(changedFields).length > 0) {
+        await trackProfileUpdate(changedFields);
+      }
 
       // Update local state
       updateUserInContext({
         ...profile!,
-        full_name: editedProfile.full_name,
-        date_of_birth: editedProfile.date_of_birth?.toISOString().split('T')[0],
-        marketing_email: editedProfile.marketing_email,
-        marketing_notifications: editedProfile.marketing_notifications,
+        full_name: updatedProfile.full_name,
+        date_of_birth: updatedProfile.date_of_birth || undefined,
+        marketing_email: updatedProfile.marketing_email,
+        marketing_notifications: updatedProfile.marketing_notifications,
       });
 
       setIsEditing(false);

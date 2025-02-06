@@ -44,7 +44,10 @@ export const trackMembershipChange = async (oldPlan: string, newPlan: string) =>
 
 export const trackProfileUpdate = async (changes: Record<string, any>) => {
   return trackActivity(ActivityType.PROFILE_UPDATED, {
-    metadata: { changes }
+    metadata: {
+      updated_fields: Object.keys(changes),
+      changes: changes
+    }
   });
 };
 
