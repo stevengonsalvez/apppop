@@ -6,4 +6,4 @@ export {
   configureSupabase,
   setupEnvironment,
   cloneTemplate,
-} from './cli'; 
+} from './cli';

@@ -14,7 +14,7 @@ vi.mock('inquirer');
 vi.mock('ora', () => {
   return {
     __esModule: true,
-    default: (text: string) => createSpinnerMock(),
+    default: (_text: string) => createSpinnerMock(),
   };
 });
 vi.mock('chalk', () => ({
@@ -35,7 +35,6 @@ import inquirer from 'inquirer';
 import {
   validateSupabaseUrl,
   validateSupabaseKey,
-  validateProjectId,
   createProjectStructure,
   configureSupabase,
   setupEnvironment,
@@ -183,12 +182,12 @@ describe('CLI Functionality', () => {
       await setupEnvironment(projectName, setupOptions, supabaseConfig);
 
       expect(writeFile).toHaveBeenCalledTimes(3); // .env, .env.example, and .gitignore
-      
+
       // Verify .env content
       const envCall = vi.mocked(writeFile).mock.calls.find(call => call[0] === '.env');
       expect(envCall?.[1]).toContain('VITE_APP_NAME=test-project');
       expect(envCall?.[1]).toContain('VITE_APP_SUPABASE_URL=https://example.supabase.co');
-      
+
       // Verify .gitignore was updated
       const gitignoreCall = vi.mocked(writeFile).mock.calls.find(call => call[0] === '.gitignore');
       expect(gitignoreCall?.[1]).toContain('.env');
@@ -224,4 +223,4 @@ describe('CLI Functionality', () => {
       expect(mockExit).toHaveBeenCalledWith(1);
     });
   });
-}); 
+});

@@ -15,4 +15,4 @@ vi.spyOn(process, 'exit').mockImplementation((code?: number) => {
 // Cleanup
 afterAll(() => {
   process.exit = processExit;
-}); 
+});
