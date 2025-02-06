@@ -38,13 +38,67 @@ jobs:
         
       - name: Run tests
         run: npm test
-        
-      - name: Version and Publish
+
+      - name: Setup Git
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          npm version patch -m "chore(bootstrap): bump version to %s [skip ci]"
+
+      - name: Determine Version Bump
+        id: version
+        run: |
+          # Get commit messages since last tag
+          COMMITS=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s")
+          
+          # Initialize flags
+          MAJOR=false
+          MINOR=false
+          PATCH=false
+          
+          # Analyze commit messages
+          while IFS= read -r commit; do
+            if [[ $commit == *"BREAKING CHANGE"* ]] || [[ $commit == "feat!"* ]]; then
+              MAJOR=true
+            elif [[ $commit == "feat"* ]]; then
+              MINOR=true
+            elif [[ $commit == "fix"* ]] || [[ $commit == "refactor"* ]] || [[ $commit == "test"* ]]; then
+              PATCH=true
+            fi
+          done <<< "$COMMITS"
+          
+          # Determine bump type
+          BUMP="patch"  # default
+          if [ "$MAJOR" = true ]; then
+            BUMP="major"
+          elif [ "$MINOR" = true ]; then
+            BUMP="minor"
+          fi
+          
+          echo "bump=$BUMP" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog
+        run: |
+          # Get commit messages since last tag
+          echo "## What's Changed" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"* %s (%h)" >> CHANGELOG.md
+          
+          # Add changelog to git
+          git add CHANGELOG.md
+          git commit -m "docs: update changelog [skip ci]"
+        
+      - name: Version and Publish
+        run: |
+          npm version ${{ steps.version.outputs.bump }} -m "chore(bootstrap): bump version to %s [skip ci]"
+          # Add generated files to git
+          git add .
+          git commit --amend --no-edit
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Push Changes
+        run: git push --follow-tags
+        env:
           GITHUB_TOKEN: ${{ github.token }} 
