@@ -9,7 +9,7 @@ interface ThemeConfig {
 }
 
 export const themeConfig: ThemeConfig = {
-  defaultColorScheme: 'appPop',
+  defaultColorScheme: 'purpleRain',
   defaultFontScheme: 'vibrantSans',
   defaultDarkMode: false,
   persistTheme: false,

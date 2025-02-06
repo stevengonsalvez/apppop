@@ -1,3 +1,42 @@
+# **Supabase Authentication Setup Guide**
+
+## **Initial Authentication Setup**
+
+### **1. Enable Authentication in Supabase**
+
+1. Go to your [Supabase Dashboard](https://app.supabase.com)
+2. Select your project
+3. Navigate to **Authentication** → **Providers**
+4. Enable the following:
+   ```
+   ✓ Email (default)
+   ✓ Phone (optional)
+   ```
+
+### **2. Configure Site URLs**
+
+1. In Supabase Dashboard, go to **Authentication** → **URL Configuration**
+2. Set the following URLs:
+   ```
+   Site URL: https://your-domain.com
+   Redirect URLs (optional):
+   - https://your-domain.com/auth/callback
+   - https://your-domain.com/*
+   ```
+
+### **3. Configure Authentication UI Settings**
+
+1. Go to **Authentication** → **Auth Settings**
+2. Configure these recommended settings:
+   ```
+   ✓ Enable Email Signup
+   ✓ Enable Email Confirmations
+   ✓ Secure Email Change
+   ✓ Enable Password Reset
+   ```
+
+---
+
 # **Supabase Email Verification & Gmail SMTP Configuration**
 
 ## **1. Configure Gmail SMTP for Supabase Auth**

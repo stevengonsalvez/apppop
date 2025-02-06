@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' vite build",
+    "build:no-sentry": "cross-env DISABLE_SENTRY=true NODE_OPTIONS='--max-old-space-size=4096' vite build",
     "preview": "vite preview",
     "test": "vitest run --reporter=json --reporter=verbose > unit-test-results.txt 2>&1",
     "test:coverage": "vitest run --coverage",
