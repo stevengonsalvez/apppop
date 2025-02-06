@@ -94,26 +94,26 @@ const getSetupOptions = async (): Promise<SetupOptions> => {
       type: 'confirm',
       name: 'includeSupabase',
       message: 'Include Supabase setup? (Authentication, Database)',
-      default: true
+      default: true,
     },
     {
       type: 'confirm',
       name: 'includeAnalytics',
       message: 'Include Analytics setup? (Google Analytics, Microsoft Clarity)',
-      default: true
+      default: true,
     },
     {
       type: 'confirm',
       name: 'includeThemeSystem',
       message: 'Include Theme System setup?',
-      default: true
+      default: true,
     },
     {
       type: 'confirm',
       name: 'includeErrorTracking',
       message: 'Include Error Tracking setup? (Sentry)',
-      default: true
-    }
+      default: true,
+    },
   ]);
 
   return answers;
@@ -121,20 +121,20 @@ const getSetupOptions = async (): Promise<SetupOptions> => {
 
 const createProjectStructure = async (): Promise<ProjectConfig> => {
   console.log(chalk.bold('\n1. Project Configuration'));
-  
+
   const projectAnswers = await inquirer.prompt([
     {
       type: 'input',
       name: 'projectName',
       message: 'Enter project name:',
-      default: 'my-apppop-app'
+      default: 'my-apppop-app',
     },
     {
       type: 'input',
       name: 'projectDir',
       message: 'Enter directory to create project in:',
-      default: (answers: any) => `./${answers.projectName}`
-    }
+      default: (answers: { projectName: string }) => `./${answers.projectName}`,
+    },
   ]);
 
   const setupOptions = await getSetupOptions();
@@ -154,11 +154,16 @@ const createProjectStructure = async (): Promise<ProjectConfig> => {
 
 const configureSupabase = async (): Promise<SupabaseConfig> => {
   console.log(chalk.bold('\n2. Supabase Configuration'));
-  console.log(chalk.yellow('\nPlease create a new Supabase project at https://app.supabase.com if you haven\'t already.'));
-  
+  console.log(
+    chalk.yellow(
+      "\nPlease create a new Supabase project at https://app.supabase.com if you haven't already."
+    )
+  );
+
   // ASCII diagram for the Supabase dashboard
   console.log(chalk.cyan('\nSupabase Dashboard Navigation:'));
-  console.log(chalk.dim(`
+  console.log(
+    chalk.dim(`
     +------------------------------------------------------+
     |   ${chalk.cyan('Supabase Dashboard')}                                 |
     +------------------------------------------------------+
@@ -175,15 +180,17 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
     | └─ SQL Editor                                       |
     |                                                      |
     +------------------------------------------------------+
-  `));
+  `)
+  );
 
   console.log(chalk.cyan('\n1. Project URL:'));
   console.log('   • Open your project in Supabase dashboard');
   console.log('   • Go to Project Settings (⚙️ icon in top navigation)');
   console.log('   • Look under "Project Configuration" -> "Project URL"');
-  
+
   // ASCII diagram for Project URL location
-  console.log(chalk.dim(`
+  console.log(
+    chalk.dim(`
     +------------------------------------------------------+
     |   ${chalk.cyan('Project Settings > Project Configuration')}           |
     +------------------------------------------------------+
@@ -199,39 +206,42 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
     | Database Password: ********                          |
     |                                                      |
     +------------------------------------------------------+
-  `));
-  
-  let supabaseUrl;
-  do {
+  `)
+  );
+
+  let supabaseUrl: string | undefined;
+  while (!supabaseUrl) {
     try {
-      const answer = await inquirer.prompt([{
-        type: 'input',
-        name: 'url',
-        message: 'Enter Supabase Project URL:',
-        default: 'https://your-project-url.supabase.co',
-        validate: (input: string) => {
-          const isValid = validateSupabaseUrl(input);
-          if (!isValid) {
-            return 'Please enter a valid Supabase URL';
-          }
-          return true;
-        }
-      }]);
+      const answer = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'url',
+          message: 'Enter Supabase Project URL:',
+          default: 'https://your-project-url.supabase.co',
+          validate: (input: string) => {
+            const isValid = validateSupabaseUrl(input);
+            if (!isValid) {
+              return 'Please enter a valid Supabase URL';
+            }
+            return true;
+          },
+        },
+      ]);
       supabaseUrl = answer.url;
-      break;
     } catch (error) {
       console.error('Error during input:', error);
     }
-  } while (true);
+  }
 
   console.log(chalk.cyan('\n2. Anon/Public Key:'));
   console.log('   • Stay in Project Settings');
   console.log('   • Go to "API" section in the sidebar');
   console.log('   • Look under "Project API keys"');
   console.log('   • Copy the "anon public" key (NOT the service_role key!)');
-  
+
   // ASCII diagram for API key location
-  console.log(chalk.dim(`
+  console.log(
+    chalk.dim(`
     +------------------------------------------------------+
     |   ${chalk.cyan('Project Settings > API')}                              |
     +------------------------------------------------------+
@@ -252,38 +262,41 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
     | │ ey********                     [Show]  │          |
     | └────────────────────────────────────────┘          |
     +------------------------------------------------------+
-  `));
+  `)
+  );
 
-  let supabaseAnonKey;
-  do {
+  let supabaseAnonKey: string | undefined;
+  while (!supabaseAnonKey) {
     try {
-      const answer = await inquirer.prompt([{
-        type: 'input',
-        name: 'key',
-        message: 'Enter Supabase Anon Key:',
-        default: 'your-anon-key',
-        validate: (input: string) => {
-          const isValid = validateSupabaseKey(input);
-          if (!isValid) {
-            return 'Please enter a valid Supabase anon key';
-          }
-          return true;
-        }
-      }]);
+      const answer = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'key',
+          message: 'Enter Supabase Anon Key:',
+          default: 'your-anon-key',
+          validate: (input: string) => {
+            const isValid = validateSupabaseKey(input);
+            if (!isValid) {
+              return 'Please enter a valid Supabase anon key';
+            }
+            return true;
+          },
+        },
+      ]);
       supabaseAnonKey = answer.key;
-      break;
     } catch (error) {
       console.error('Error during input:', error);
     }
-  } while (true);
+  }
 
   console.log(chalk.cyan('\n3. Project ID:'));
   console.log('   • Go to "General" settings in the sidebar');
   console.log('   • Find "Reference ID" under Project Settings');
   console.log('   • This is used for CLI configuration and API access');
-  
+
   // ASCII diagram for Project ID location
-  console.log(chalk.dim(`
+  console.log(
+    chalk.dim(`
     +------------------------------------------------------+
     |   ${chalk.cyan('Project Settings > General')}                          |
     +------------------------------------------------------+
@@ -301,30 +314,32 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
     | ├─ Password: ********                              |
     | └─ Port: 5432                                      |
     +------------------------------------------------------+
-  `));
+  `)
+  );
 
-  let supabaseProjectId;
-  do {
+  let supabaseProjectId: string | undefined;
+  while (!supabaseProjectId) {
     try {
-      const answer = await inquirer.prompt([{
-        type: 'input',
-        name: 'id',
-        message: 'Enter Supabase Project ID:',
-        default: 'your-project-id',
-        validate: (input: string) => {
-          const isValid = validateProjectId(input);
-          if (!isValid) {
-            return 'Please enter a valid Supabase project ID';
-          }
-          return true;
-        }
-      }]);
+      const answer = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'id',
+          message: 'Enter Supabase Project ID:',
+          default: 'your-project-id',
+          validate: (input: string) => {
+            const isValid = validateProjectId(input);
+            if (!isValid) {
+              return 'Please enter a valid Supabase project ID';
+            }
+            return true;
+          },
+        },
+      ]);
       supabaseProjectId = answer.id;
-      break;
     } catch (error) {
       console.error('Error during input:', error);
     }
-  } while (true);
+  }
 
   return { supabaseUrl, supabaseAnonKey, supabaseProjectId };
 };
@@ -332,19 +347,19 @@ const configureSupabase = async (): Promise<SupabaseConfig> => {
 const cloneTemplate = (projectDir: string): void => {
   const spinner = ora('Cloning template repository...').start();
   try {
-    execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, { 
+    execSync(`git clone --depth 1 ${TEMPLATE_REPO} ${projectDir}`, {
       stdio: ['ignore', 'pipe', 'pipe'],
-      encoding: 'utf-8'
+      encoding: 'utf-8',
     });
-    
+
     process.chdir(projectDir);
-    
+
     const tenantReadmePath = join(__dirname, '..', 'tenant_readme.md');
     const setupPath = join(__dirname, '..', 'setup.md');
-    
+
     execSync(`cp ${tenantReadmePath} README.md`, { stdio: 'ignore' });
     execSync(`cp ${setupPath} docs/setup.md`, { stdio: 'ignore' });
-    
+
     execSync('rm -rf .git', { stdio: 'ignore' });
     execSync('rm -rf .claudesync', { stdio: 'ignore' });
     spinner.succeed('Template repository cloned and cleaned');
@@ -352,9 +367,9 @@ const cloneTemplate = (projectDir: string): void => {
     spinner.fail('Failed to clone template');
     if (error instanceof Error) {
       console.error(chalk.red('\nError details:'));
-      // @ts-ignore - execSync error has stderr property
+      // @ts-expect-error execSync error has stderr property
       if (error.stderr) console.error(chalk.yellow(error.stderr));
-      // @ts-ignore - execSync error has stdout property
+      // @ts-expect-error execSync error has stdout property
       if (error.stdout) console.error(chalk.yellow(error.stdout));
     }
     console.error(chalk.cyan('\nPossible solutions:'));
@@ -379,7 +394,10 @@ const initializeGit = (): void => {
   }
 };
 
-const updateProjectFiles = async (projectName: string, supabaseConfig?: SupabaseConfig): Promise<void> => {
+const updateProjectFiles = async (
+  projectName: string,
+  supabaseConfig?: SupabaseConfig
+): Promise<void> => {
   const spinner = ora('Updating project files...').start();
   try {
     const filesToUpdate = [
@@ -389,7 +407,7 @@ const updateProjectFiles = async (projectName: string, supabaseConfig?: Supabase
       'vite.config.ts',
       '.env',
       '.env.example',
-      'capacitor.config.ts'
+      'capacitor.config.ts',
     ];
 
     // Only include Supabase config if Supabase is enabled
@@ -404,8 +422,14 @@ const updateProjectFiles = async (projectName: string, supabaseConfig?: Supabase
 
         if (file === 'capacitor.config.ts') {
           updatedContent = content
-            .replace(/appId: ['"]com\.apppop\.app['"]/g, `appId: 'com.${projectName.toLowerCase()}.app'`)
-            .replace(/appName: ['"]AppPop['"]/g, `appName: '${projectName.charAt(0).toUpperCase() + projectName.slice(1).toLowerCase()}'`);
+            .replace(
+              /appId: ['"]com\.apppop\.app['"]/g,
+              `appId: 'com.${projectName.toLowerCase()}.app'`
+            )
+            .replace(
+              /appName: ['"]AppPop['"]/g,
+              `appName: '${projectName.charAt(0).toUpperCase() + projectName.slice(1).toLowerCase()}'`
+            );
         } else if (file === 'supabase/config.toml' && supabaseConfig) {
           updatedContent = content
             .replace(/project_id = ".*"/g, `project_id = "${supabaseConfig.supabaseProjectId}"`)
@@ -413,7 +437,10 @@ const updateProjectFiles = async (projectName: string, supabaseConfig?: Supabase
         } else {
           updatedContent = content
             .replace(/apppop/g, projectName.toLowerCase())
-            .replace(/AppPop/g, projectName.charAt(0).toUpperCase() + projectName.slice(1).toLowerCase());
+            .replace(
+              /AppPop/g,
+              projectName.charAt(0).toUpperCase() + projectName.slice(1).toLowerCase()
+            );
         }
 
         await writeFile(file, updatedContent);
@@ -432,7 +459,11 @@ const updateProjectFiles = async (projectName: string, supabaseConfig?: Supabase
   }
 };
 
-const setupEnvironment = async (projectName: string, setupOptions: SetupOptions, supabaseConfig?: SupabaseConfig): Promise<void> => {
+const setupEnvironment = async (
+  projectName: string,
+  setupOptions: SetupOptions,
+  supabaseConfig?: SupabaseConfig
+): Promise<void> => {
   const spinner = ora('Setting up environment variables...').start();
   try {
     let envContent = `# Environment Variables for ${projectName}
@@ -496,7 +527,10 @@ VITE_SENTRY_DSN=https://xxx@xxx.ingest.sentry.io/xxx
     try {
       const gitignoreContent = await readFile(gitignorePath, 'utf8');
       if (!gitignoreContent.includes('.env')) {
-        await writeFile(gitignorePath, gitignoreContent + '\n# Environment Variables\n.env\n.env.local\n.env.*.local\n');
+        await writeFile(
+          gitignorePath,
+          gitignoreContent + '\n# Environment Variables\n.env\n.env.local\n.env.*.local\n'
+        );
       }
     } catch (err) {
       await writeFile(gitignorePath, '# Environment Variables\n.env\n.env.local\n.env.*.local\n');
@@ -564,7 +598,7 @@ const showFinalInstructions = (projectDir: string, setupOptions: SetupOptions): 
     console.log('     - minimal (System fonts)');
   }
 
-  console.log('5. Run \'npm run dev\' to start the development server');
+  console.log("5. Run 'npm run dev' to start the development server");
 
   if (setupOptions.includeAnalytics || setupOptions.includeErrorTracking) {
     console.log('6. Set up additional services:');
@@ -576,7 +610,7 @@ const showFinalInstructions = (projectDir: string, setupOptions: SetupOptions): 
       console.log('   - Sentry for error monitoring');
     }
   }
-  
+
   if (setupOptions.includeSupabase) {
     console.log(chalk.cyan('\nImportant Security Reminder:'));
     console.log('• Review Auth.md for security best practices');
@@ -597,17 +631,17 @@ const showFinalInstructions = (projectDir: string, setupOptions: SetupOptions): 
     console.log('  - Configurable letter spacing');
     console.log('  - Primary and secondary font families');
   }
-  
+
   console.log(chalk.bold('\nHappy coding! 🎉'));
 };
 
 const main = async (): Promise<void> => {
   console.log(chalk.bold.green('\nWelcome to AppPop Project Creator! 🚀\n'));
-  
+
   try {
     checkPrerequisites();
     const { projectName, projectDir, setupOptions } = await createProjectStructure();
-    
+
     let supabaseConfig: SupabaseConfig | undefined;
     if (setupOptions.includeSupabase) {
       supabaseConfig = await configureSupabase();
@@ -618,11 +652,11 @@ const main = async (): Promise<void> => {
     await updateProjectFiles(projectName, supabaseConfig);
     await setupEnvironment(projectName, setupOptions, supabaseConfig);
     installDependencies();
-    
+
     if (setupOptions.includeSupabase) {
       setupSupabaseCLI();
     }
-    
+
     showFinalInstructions(projectDir, setupOptions);
   } catch (error) {
     console.error(chalk.red('\nAn error occurred:'), error);
@@ -631,7 +665,7 @@ const main = async (): Promise<void> => {
 };
 
 // Ensure we handle the promise rejection
-main().catch((error) => {
+main().catch(error => {
   console.error(chalk.red('\nUnexpected error:'), error);
   process.exit(1);
-}); 
+});

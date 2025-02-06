@@ -11,8 +11,8 @@
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "test": "vitest run",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint \"src/**/*.{js,ts}\" --fix",
+    "lint:fix": "eslint \"src/**/*.{js,ts}\" --fix",
     "dev": "node --experimental-specifier-resolution=node --loader ts-node/esm src/cli.ts"
   },
   "files": [
