@@ -1,300 +1,174 @@
-# AppPop
+# 🚀 AppPop
 
-A modern React template with Material UI components, Supabase authentication, and TypeScript.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/create-apppop-app.svg)](https://www.npmjs.com/package/create-apppop-app)
+[![Supabase](https://img.shields.io/badge/Supabase-2.x-green.svg)](https://supabase.io/)
+[![Material-UI](https://img.shields.io/badge/MUI-5.x-purple.svg)](https://mui.com/)
+[![Capacitor](https://img.shields.io/badge/Capacitor-5.x-blue.svg)](https://capacitorjs.com/)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Known Vulnerabilities](https://snyk.io/test/github/dwyl/hapi-auth-jwt2/badge.svg?targetFile=package.json)](https://snyk.io/test/github/dwyl/hapi-auth-jwt2?targetFile=package.json)
 
-## Features
+
+A modern, feature-rich React template powered by Material UI and Supabase for building production-ready web and native mobile applications with blazing-fast development speed.
+
+## ✨ Features
+
+### 📱 Cross-Platform
+- Build for Web, iOS, and Android from single codebase
+- Native device features with Capacitor
+- Progressive Web App (PWA) support
+- Automated builds with Ionic Cloud
+
+### 🎨 Rich UI Components
+- Stories interface (Instagram-style)
+- Interactive Timeline view
+- Dark mode support
+- Responsive navigation (desktop/mobile)
+- Profile management
+- Custom theme builder
 
 ### 🔐 Authentication & Authorization
-- Supabase authentication
-- Protected routes
-- User profile management
+- Secure Supabase authentication with multiple providers 
+- Row Level Security (RLS) policies
+- Protected routes and middleware
+- Email verification flow
+- Profile management
 
-### 🎨 UI Components
-- Material UI v5 components
-- Responsive layout with:
-  - Left drawer navigation (desktop)
-  - Bottom navigation bar (mobile)
-  - App bar with notifications
-- Dark mode support
-- Cookie consent management
-- Loading states and error handling
+### 🎨 Theme System
+- [Customizable themes](docs/theme-system.md) with light/dark mode
+- 8+ pre-built color schemes
+- CSS-in-JS styling with Emotion
+- Responsive layout system
+- Custom font schemes
 
-### 📊 Analytics
-- Microsoft Clarity integration with privacy controls
-- Cookie-based consent management
-- Analytics opt-in/opt-out functionality
+### 📊 Analytics & Monitoring
+- [Google Analytics 4 integration](docs/GoogleAnalytics.md)
+- [Google Tag Manager setup](docs/gtm-setup.md)
+- [Sentry error tracking](docs/monitoring.md)
+- [Microsoft Clarity heatmaps](docs/heatmap.md)
+- [Cookie consent management](docs/cookieconsent.md)
 
-## Documentation
+### 🛠️ Development Tools
+- TypeScript for type safety
+- Vite for blazing fast builds
+- ESLint & Prettier configuration
+- Testing setup with Playwright
+- CI/CD with Ionic Cloud
 
-Detailed documentation is available in the `docs` folder:
+## 📱 Native App Development
 
-- [Setup Guide](docs/setup.md) - Initial setup and configuration
-- [Theme System](docs/theme-system.md) - Color schemes and font configuration
-- [Analytics](docs/analytics.md) - Analytics integration and privacy controls
-- [Components](docs/components.md) - Available components and usage
-- [Project Structure](docs/project-structure.md) - Codebase organization
-- [Development Guide](docs/development.md) - Development workflow and best practices
-
-## Quick Start
+Build and run native apps:
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd apppop
+# iOS Setup
+npm run cap add ios
+npm run cap open ios
 
-# Install dependencies
-npm install
+# Android Setup
+npm run cap add android
+npm run cap open android
 
-# Set up environment variables
-cp .env.example .env
+# Build and sync
+npm run build
+npm run cap sync
+```
 
-# Start development server
+## 🚦 Quick Start
+
+The fastest way to get started is using the CLI:
+
+```bash
+npx create-apppop-app my-app
+cd my-app
 npm run dev
 ```
 
-See the [Setup Guide](docs/setup.md) for complete installation instructions.
+For detailed setup instructions, check out our [Setup Guide](docs/setup.md).
 
+## 📚 Documentation
 
-## Theme System
+- [🔧 Setup Guide](docs/setup.md) - Complete setup instructions
+- [🎯 Development Guide](docs/development.md) - Development workflow
+- [🎨 Theme System](docs/theme-system.md) - Theme customization
+- [📦 Components](docs/components.md) - Available components
+- [📊 Analytics Setup](docs/GoogleAnalytics.md) - Analytics integration
+- [🔒 Authentication Guide](docs/auth.md) - Auth configuration
 
-### Color System
+## 🏗️ Project Structure
 
-Each color scheme includes:
-
-1. **Primary Colors**
-   - `main` - Primary brand color
-   - `light` - Lighter variant
-   - `dark` - Darker variant
-   - `contrastText` - Text color for primary backgrounds
-
-2. **Secondary Colors**
-   - Similar structure to primary colors
-   - Used for accents and secondary actions
-
-3. **Tertiary Colors**
-   - Additional brand color for special elements
-   - Available through CSS variables or theme variants
-   - Use for unique UI elements or emphasis
-
-4. **Background Colors**
-   - `default` - Main background
-   - `paper` - Card and surface backgrounds
-   - `surface` - Alternative surface color
-   - `surfaceVariant` - Additional surface variant
-
-5. **Text Colors**
-   - `primary` - Main text color
-   - `secondary` - Less prominent text
-   - `disabled` - Disabled state text
-
-6. **State Colors**
-   - `error` - Error states
-   - `warning` - Warning states
-   - `info` - Information states
-   - `success` - Success states
-
-### Using Colors in Components
-
-1. **Standard MUI Colors**
-```tsx
-<Button color="primary">Primary Button</Button>
-<Button color="secondary">Secondary Button</Button>
+```
+├── src/
+│   ├── components/     # Reusable components
+│   ├── contexts/      # React contexts
+│   ├── hooks/        # Custom hooks
+│   ├── pages/        # Page components
+│   ├── theme/        # Theme configuration
+│   ├── types/        # TypeScript types
+│   ├── utils/        # Utility functions
+│   ├── App.tsx       # Main app component
+│   └── index.tsx     # Entry point
+├── docs/            # Documentation
+├── playwright/      # E2E tests
+├── ios/            # iOS native project
+├── android/        # Android native project
+└── public/         # Static assets
 ```
 
-2. **Tertiary Colors**
-```tsx
-<Button color="tertiary">Tertiary Button</Button>
+## 🧪 Available Scripts
+
+```bash
+# Development
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+
+# Mobile
+npm run cap sync     # Sync native projects
+npm run cap open ios # Open iOS project
+npm run cap run android # Run on Android
+
+# Testing
+npm run test         # Run unit tests
+npm run test:e2e     # Run E2E tests
+npm run lint         # Run linter
 ```
 
-3. **CSS Variables**
-```tsx
-const StyledComponent = styled('div')({
-  backgroundColor: 'var(--tertiary-main)',
-  color: 'var(--tertiary-contrast-text)',
-});
-```
+## 🔮 Upcoming Features
 
-4. **Theme Access**
-```tsx
-const theme = useTheme();
-const style = {
-  color: theme.palette.primary.main,
-  background: theme.palette.background.surface,
-};
-```
+- 📱 Full native app build and release guide
+- 💳 Payment integrations
+  - Stripe
+  - Atoa
+- 📊 Crashlytics integration
+- 🗄️ Backend integrations
+  - Airtable
+  - NocoDB
+- 📦 More pre-built components
+- 📱 Enhanced native features
 
-### Available Color Schemes
+## 🤝 Contributing
 
-The app comes with several pre-configured color schemes:
+Contributions are welcome! 
 
-- `default` - Classic blue Material Design theme
-- `indigo` - Deep purple and pink accents
-- `emerald` - Nature-inspired green theme
-- `sunset` - Warm orange and yellow tones
-- `ocean` - Calming blue tones
-- `purpleRain` - Rich purple gradients
-- `mint` - Fresh mint green theme
+## 📝 License
 
-Each color scheme includes both light and dark mode variants.
+This project is licensed under the MIT License
 
-### Configuring the Theme
+## 🙏 Acknowledgments
 
-1. **Default Theme**
+- [React](https://reactjs.org/)
+- [Material-UI](https://mui.com/)
+- [Supabase](https://supabase.io/)
+- [Capacitor](https://capacitorjs.com/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
 
-   Set your preferred default theme in `src/config/theme.config.ts`:
+## 🔗 Links
 
-   ```typescript
-   export const themeConfig = {
-     defaultColorScheme: 'ocean', // Choose from available schemes
-     defaultDarkMode: false,      // Set dark mode as default
-     persistTheme: true,          // Save preferences to localStorage
-   };
-   ```
+- [Website](https://apppop.dev)
+- [Documentation](https://docs.apppop.dev)
+- [GitHub](https://github.com/stevengonsalvez/apppop)
+- [npm package](https://www.npmjs.com/package/create-apppop-app)
 
-2. **Runtime Theme Changes**
-
-   Use the theme hooks in your components:
-
-   ```typescript
-   import { useTheme } from '../contexts/ThemeContext';
-
-   const MyComponent = () => {
-     const { setColorScheme, toggleDarkMode } = useTheme();
-
-     // Change color scheme
-     const handleSchemeChange = () => {
-       setColorScheme('sunset');
-     };
-
-     // Toggle dark mode
-     const handleDarkMode = () => {
-       toggleDarkMode();
-     };
-   };
-   ```
-
-3. **Theme Persistence**
-
-   Theme preferences are automatically saved to localStorage when `persistTheme` is enabled in the config.
-
-### Creating Custom Color Schemes
-
-Add your own color scheme in `src/theme/colorScheme.ts`:
-
-```typescript
-export const myCustomScheme: ColorScheme = {
-  name: 'custom',
-  light: {
-    primary: {
-      main: '#your-color',
-      light: '#lighter-variant',
-      dark: '#darker-variant',
-      contrastText: '#text-color',
-    },
-    secondary: {
-      // Similar structure to primary
-    },
-    tertiary: {
-      // Similar structure to primary
-    },
-    background: {
-      default: '#background-color',
-      paper: '#surface-color',
-      surface: '#alternative-surface',
-      surfaceVariant: '#variant-surface',
-    },
-    text: {
-      primary: '#main-text',
-      secondary: '#secondary-text',
-      disabled: '#disabled-text',
-    },
-    error: {
-      // Error colors
-    },
-    // Optional: success, warning, info colors
-  },
-  dark: {
-    // Dark mode variants with same structure
-  },
-};
-
-// Add to colorSchemes object
-export const colorSchemes = {
-  // ... existing schemes
-  custom: myCustomScheme,
-} as const;
-```
-
-### Font System
-
-Each font scheme includes:
-
-1. **Font Families**
-   - `primary` - Main font family for the application
-   - `secondary` - Optional secondary font for specific elements
-
-2. **Font Weights**
-   - `light` (300) - Lightest weight
-   - `regular` (400) - Regular text
-   - `medium` (500) - Medium emphasis
-   - `semibold` (600) - High emphasis
-   - `bold` (700) - Strongest emphasis
-
-3. **Letter Spacing**
-   - `tight` - Compact spacing for headings
-   - `normal` - Standard spacing for body text
-   - `wide` - Expanded spacing for buttons/emphasis
-
-### Available Font Schemes
-
-The app comes with several pre-configured font schemes:
-
-- `modern` - Uses Inter for a contemporary look
-- `classic` - Roboto with Roboto Slab as secondary
-- `minimal` - System fonts for a native feel
-
-### Configuring Fonts
-
-1. **Default Font Scheme**
-
-   Set your preferred default font scheme in `src/config/theme.config.ts`:
-
-   ```typescript
-   export const themeConfig = {
-     defaultColorScheme: 'sunset',
-     defaultFontScheme: 'modern',    // Choose from available schemes
-     defaultDarkMode: false,
-     persistTheme: true,
-   };
-   ```
-
-2. **Creating Custom Font Schemes**
-
-   Add your own font scheme in `src/theme/fontScheme.ts`:
-
-   ```typescript
-   export const myCustomScheme: FontScheme = {
-     fontFamily: {
-       primary: '"Your-Font", "Fallback-Font", sans-serif',
-       secondary: '"Optional-Secondary-Font", serif',
-     },
-     fontWeights: {
-       light: 300,
-       regular: 400,
-       medium: 500,
-       semibold: 600,
-       bold: 700,
-     },
-     letterSpacing: {
-       tight: '-0.02em',
-       normal: '0em',
-       wide: '0.02em',
-     },
-   };
-
-   // Add to fontSchemes object
-   export const fontSchemes = {
-     // ... existing schemes
-     custom: myCustomScheme,
-   } as const;
-   ```
+---
