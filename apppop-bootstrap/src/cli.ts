@@ -350,18 +350,29 @@ export const cloneTemplate = (projectDir: string): void => {
 
     // Copy files from the template repository itself
     try {
-      execSync('cp docs/setup-template.md docs/setup.md', { stdio: 'pipe' });
+      // Only create setup.md if it doesn't exist
+      if (!execSync('test -f docs/setup.md', { stdio: 'pipe' })) {
+        execSync('cp docs/setup-template.md docs/setup.md', { stdio: 'pipe' });
+      }
       execSync('cp README-template.md README.md', { stdio: 'pipe' });
     } catch (copyError) {
       console.warn(chalk.yellow('\nWarning: Could not copy template files. Using defaults.'));
       // Create minimal README if template copy fails
-      execSync('echo "# New AppPop Project\n\nCreated with AppPop Bootstrap" > README.md', {
-        stdio: 'pipe',
-      });
       execSync(
-        'mkdir -p docs && echo "# Setup Guide\n\nSetup instructions will be added here." > docs/setup.md',
-        { stdio: 'pipe' }
+        'echo "# New AppPop Project\n\n' +
+          'Created with [AppPop](https://github.com/stevengonsalvez/apppop)\n\n' +
+          '<p align=\\"center\\"><img src=\\"https://github.com/user-attachments/assets/4ab1ea83-77b9-4df9-a3d5-40724bd06b71\\" width=\\"200\\"></p>" > README.md',
+        {
+          stdio: 'pipe',
+        }
       );
+      // Only create setup.md if it doesn't exist
+      if (!execSync('test -f docs/setup.md', { stdio: 'pipe' })) {
+        execSync(
+          'mkdir -p docs && echo "# Setup Guide\n\nSetup instructions will be added here." > docs/setup.md',
+          { stdio: 'pipe' }
+        );
+      }
     }
 
     execSync('rm -rf .git', { stdio: 'pipe' });
