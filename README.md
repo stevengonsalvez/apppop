@@ -61,11 +61,23 @@ A modern, feature-rich React template powered by Material UI and Supabase for bu
 - Testing setup with Playwright
 - CI/CD with Ionic Cloud
 
+
+## 🚦 Quick Start
+
+The fastest way to get started is using the bootstrapCLI:
+
+```bash
+npm install -g @apppop/bootstrap
+cd my-app
+create-apppop-app
+```
+
 ## 📱 Native App Development
 
 Build and run native apps:
 
 ```bash
+cd my-app
 # iOS Setup
 npm run cap add ios
 npm run cap open ios
@@ -79,15 +91,7 @@ npm run build
 npm run cap sync
 ```
 
-## 🚦 Quick Start
 
-The fastest way to get started is using the CLI:
-
-```bash
-npx create-apppop-app my-app
-cd my-app
-npm run dev
-```
 
 For detailed setup instructions, check out our [Setup Guide](docs/setup.md).
 
