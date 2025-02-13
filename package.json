@@ -34,7 +34,7 @@
     "@capacitor/core": "^6.1.2",
     "@capacitor/haptics": "6.0.1",
     "@capacitor/ios": "^6.1.2",
-    "@capacitor/keyboard": "6.0.2",
+    "@capacitor/keyboard": "6.0.3",
     "@capacitor/status-bar": "6.0.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
