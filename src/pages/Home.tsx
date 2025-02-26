@@ -17,11 +17,10 @@ import { useHistory } from 'react-router-dom';
 const MotionBox = motion(Box);
 const MotionChip = motion(Chip);
 
-interface FeatureCard {
+interface BaseCard {
   type: string;
   title: string;
   level: string;
-  progress?: number;
   color: string;
   icon: React.ReactNode;
   users?: number;
@@ -29,17 +28,15 @@ interface FeatureCard {
   size: 'small' | 'medium' | 'large';
 }
 
-interface DocumentationCard {
+interface FeatureCard extends BaseCard {
+  type: 'feature';
+  progress?: number;
+}
+
+interface DocumentationCard extends BaseCard {
   type: 'documentation';
-  title: string;
   docTitle: string;
   markdownPath: string;
-  level: string;
-  color: string;
-  icon: React.ReactNode;
-  users?: number;
-  image?: string;
-  size: 'small' | 'medium' | 'large';
 }
 
 export const features: (FeatureCard | DocumentationCard)[] = [
@@ -187,15 +184,12 @@ const CardComponent: React.FC<{ item: FeatureCard | DocumentationCard; index: nu
         onClick={handleClick}
         initial={{ 
           opacity: 0,
-          rotateX: 75,
-          y: -200,
-          z: -100
+          rotate: index + 1,
+          y: 20
         }}
         animate={{ 
           opacity: 1,
-          rotateX: 0,
-          y: 0,
-          z: 0
+          y: 0
         }}
         transition={{ 
           type: "spring",
@@ -204,26 +198,28 @@ const CardComponent: React.FC<{ item: FeatureCard | DocumentationCard; index: nu
           delay: index * 0.1 
         }}
         whileHover={{ 
-          rotateX: 0,
-          rotateZ: 0,
           scale: 1.02,
-          transition: { duration: 0.6 }
+          rotate: 0,
+          transition: { duration: 0.3 }
         }}
         sx={{
+          position: 'sticky',
+          top: `${100 + (index * 16)}px`,
+          rotate: `${index + 1}deg`,
           bgcolor: 'background.paper',
-          borderRadius: 4,
-          position: 'relative',
+          borderRadius: '4px',
           overflow: 'hidden',
           cursor: 'pointer',
           backgroundImage: item.image ? `url(${item.image})` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          transformStyle: 'preserve-3d',
-          perspective: '900px',
-          boxShadow: '0px 20px 60px rgba(0,0,0, 0.5)',
-          '&:hover': {
-            boxShadow: '0px 0px 20px rgba(0,0,0, 0.3)',
-          },
+          boxShadow: '0 -0.5rem 1rem rgba(0, 0, 0, 0.15)',
+          padding: '1.5rem',
+          margin: '0.5rem',
+          minHeight: '200px',
+          zIndex: 20 - index,
+          transformOrigin: 'center center',
+          willChange: 'transform',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -234,57 +230,61 @@ const CardComponent: React.FC<{ item: FeatureCard | DocumentationCard; index: nu
             background: `linear-gradient(135deg, ${alpha(item.color, 0.8)}, ${alpha(item.color, 0.4)})`,
             zIndex: 1,
           },
-          ...sizeStyles,
         }}
       >
-        <Box sx={{ position: 'relative', zIndex: 2, p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <Box sx={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <Box>
-            <Typography variant="caption" sx={{ color: 'text.secondary', bgcolor: alpha(_theme.palette.background.paper, 0.8), px: 1, py: 0.5, borderRadius: 1, fontSize: '0.7rem' }}>
+            <Typography variant="caption" sx={{ 
+              color: 'text.secondary', 
+              bgcolor: alpha(_theme.palette.background.paper, 0.8), 
+              px: 1, 
+              py: 0.5, 
+              borderRadius: 1, 
+              fontSize: '0.7rem' 
+            }}>
               {item.type === 'documentation' ? 'Documentation' : item.type}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.2)', fontSize: '1.4rem' }}>
+              <Typography variant="h4" sx={{ 
+                fontWeight: 'bold', 
+                color: 'white', 
+                textShadow: '0 2px 4px rgba(0,0,0,0.2)', 
+                fontSize: '1.4rem' 
+              }}>
                 {item.title}
               </Typography>
               {item.users && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: item.color }}>
-                    {item.users}
-                  </Avatar>
-                </Box>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: item.color }}>
+                  {item.users}
+                </Avatar>
               )}
             </Box>
           </Box>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: 'white',
-                bgcolor: alpha(_theme.palette.background.paper, 0.3),
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 2,
-                backdropFilter: 'blur(4px)',
-                fontSize: '0.7rem'
-              }}
-            >
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+            <Typography variant="body2" sx={{ 
+              color: 'white',
+              bgcolor: alpha(_theme.palette.background.paper, 0.3),
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 2,
+              backdropFilter: 'blur(4px)',
+              fontSize: '0.7rem'
+            }}>
               {item.level}
             </Typography>
             {'progress' in item && item.progress && (
-              <Box
-                sx={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: '50%',
-                  border: `3px solid ${item.color}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: alpha(_theme.palette.background.paper, 0.3),
-                  backdropFilter: 'blur(4px)'
-                }}
-              >
+              <Box sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%',
+                border: `3px solid ${item.color}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: alpha(_theme.palette.background.paper, 0.3),
+                backdropFilter: 'blur(4px)'
+              }}>
                 <Typography sx={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>
                   {item.progress}%
                 </Typography>
@@ -312,16 +312,25 @@ export const HomePage: React.FC = () => {
 
   return (
     <Box sx={{ 
-      p: 3, 
+      marginInline: 'max(0px, ((100% - 1200px) / 2))',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 2,
       pb: { xs: 8, sm: 3 },
-      bgcolor: 'background.default', 
+      px: 3,
+      pt: { xs: '100px', sm: '100px' },
       minHeight: '100vh',
+      bgcolor: 'background.default',
+      overflow: 'visible',
       position: 'relative',
-      zIndex: 0,
-      perspective: '900px',
-      transformStyle: 'preserve-3d'
     }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 6 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        mb: 6,
+        position: 'relative',
+        zIndex: 2,
+      }}>
         <Box sx={{ maxWidth: '800px' }}>
           <MotionBox
             initial={{ opacity: 0, y: -20 }}
@@ -388,7 +397,14 @@ export const HomePage: React.FC = () => {
         </Box>
       </Box>
 
-      <Box sx={{ mb: 4, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+      <Box sx={{ 
+        mb: 4, 
+        display: 'flex', 
+        gap: 1, 
+        flexWrap: 'wrap',
+        position: 'relative',
+        zIndex: 2,
+      }}>
         {categories.map((category, index) => (
           <MotionChip
             key={category}
@@ -413,17 +429,10 @@ export const HomePage: React.FC = () => {
         ))}
       </Box>
 
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: { 
-          xs: 'repeat(2, 1fr)',
-          sm: 'repeat(3, 1fr)',
-          md: 'repeat(4, 1fr)',
-          lg: 'repeat(4, 1fr)'
-        },
-        gap: { xs: 2, sm: 3 },
-        gridAutoFlow: 'dense',
-        pb: { xs: 8, sm: 3 },
+      <Box sx={{
+        position: 'relative',
+        zIndex: 1,
+        mt: 4,
       }}>
         {features.map((item, index) => (
           <CardComponent key={item.title} item={item} index={index} />
