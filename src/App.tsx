@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Redirect, useHistory, RouteComponentProps } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, useHistory, RouteComponentProps, Switch } from 'react-router-dom';
 import { Box, CssBaseline, AppBar, Toolbar, IconButton } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { theme } from './theme/theme';
@@ -28,6 +28,7 @@ import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
 import { HomePage } from './pages/Home';
 import { EmailVerification } from './pages/EmailVerification';
+import { DocumentationPage } from './pages/Documentation';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -242,7 +243,10 @@ const App: React.FC = () => {
         <QueryClientProvider client={queryClient}>
           <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
             <Router>
-              <AppContent />
+              <Switch>
+                <Route exact path="/docs/:docPath" component={DocumentationPage} />
+                <Route path="/" component={AppContent} />
+              </Switch>
             </Router>
           </Box>
           {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
