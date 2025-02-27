@@ -39,6 +39,21 @@ const morphAndGlow = keyframes`
   }
 `;
 
+const logoGlow = keyframes`
+  0% {
+    filter: drop-shadow(0 0 2px rgba(144, 202, 249, 0.2));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(144, 202, 249, 0.8));
+    transform: scale(1.03);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(144, 202, 249, 0.2));
+    transform: scale(1);
+  }
+`;
+
 const StyledLogoWrapper = styled('div')(({ theme }) => ({
   marginLeft: 'auto',
   cursor: 'pointer',
@@ -138,6 +153,18 @@ export const InteractiveLogo: React.FC<InteractiveLogoProps> = ({
             objectFit: 'contain',
             borderRadius: 2,
             display: 'block',
+            animation: `${logoGlow} 3s infinite ease-in-out`,
+            transition: 'all 0.3s ease',
+            filter: `drop-shadow(0 0 4px ${isDarkMode ? 
+              alpha(theme.palette.primary.light, 0.4) : 
+              alpha(theme.palette.primary.main, 0.4)})`,
+            '&:hover': {
+              animation: 'none',
+              filter: `drop-shadow(0 0 12px ${isDarkMode ? 
+                theme.palette.primary.light : 
+                theme.palette.primary.main})`,
+              transform: 'scale(1.05)',
+            }
           }}
         />
       </StyledLogoWrapper>
