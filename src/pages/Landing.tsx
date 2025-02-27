@@ -51,7 +51,7 @@ export const LandingPage: React.FC = () => {
             variant="contained"
             size="large"
             fullWidth
-            onClick={() => history.push('/login')}
+            onClick={() => history.push('/app/login')}
             sx={{
               height: 48,
               bgcolor: 'primary.main',
@@ -68,7 +68,7 @@ export const LandingPage: React.FC = () => {
             variant="outlined"
             size="large"
             fullWidth
-            onClick={() => history.push('/register')}
+            onClick={() => history.push('/app/register')}
             sx={{
               height: 48,
               borderColor: 'common.white',

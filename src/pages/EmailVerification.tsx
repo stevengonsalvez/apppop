@@ -47,7 +47,7 @@ export const EmailVerification: React.FC = () => {
 
         // Wait a moment before redirecting
         setTimeout(() => {
-          history.push('/login?verified=true');
+          history.push('/app/login?verified=true');
         }, 2000);
       } catch (err: any) {
         console.error('Verification error:', err);

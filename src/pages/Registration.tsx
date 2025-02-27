@@ -108,7 +108,7 @@ export const RegistrationPage: React.FC = () => {
       });
       
       setTimeout(() => {
-        history.push('/login');
+        history.push('/app/login');
       }, 2000);
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -323,7 +323,7 @@ export const RegistrationPage: React.FC = () => {
             
             {state.step === 1 && (
               <Box sx={{ mt: 3, textAlign: 'center' }}>
-                <Link to="/login" style={{ textDecoration: 'none' }}>
+                <Link to="/app/login" style={{ textDecoration: 'none' }}>
                   <Typography color="primary" variant="body2">
                     Already have an account? Sign in
                   </Typography>

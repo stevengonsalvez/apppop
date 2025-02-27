@@ -27,6 +27,7 @@ import CheckoutPage from './pages/Checkout';
 import { Plan, Addon } from './types/plan';
 import StoriesPage from './pages/Stories';
 import { HomePage } from './pages/Home';
+import DashboardPage from './pages/Dashboard';
 import { EmailVerification } from './pages/EmailVerification';
 import { DocumentationPage } from './pages/Documentation';
 import { keyframes } from '@mui/material/styles';
@@ -93,12 +94,12 @@ const AuthenticatedApp: React.FC = () => {
   };
 
   const handleNavigation = (path: string) => {
-    history.push(path);
+    history.push(`/app${path}`);
     setMobileOpen(false);
   };
 
   const handleLogoTextClick = () => {
-    history.push('/home');
+    history.push('/app/dashboard');
   };
 
   useEffect(() => {
@@ -210,19 +211,16 @@ const AuthenticatedApp: React.FC = () => {
           mb: ['56px', 0],
         }}
       >
-        <Route exact path="/verify" component={EmailVerification} />
-        <Route exact path="/home" component={HomePage} />
-        <Route exact path="/profile" component={ProfilePage} />
-        <Route exact path="/plans" component={PlansPage} />
-        <Route exact path="/timeline" component={TimelinePage} />
-        <Route exact path="/stories" component={StoriesPage} />
-        <Route 
-          exact 
-          path="/checkout" 
-          component={CheckoutRoute}
-        />
-        <Route exact path="/">
-          <Redirect to="/home" />
+        <Route exact path="/app/verify" component={EmailVerification} />
+        <Route exact path="/app/home" component={HomePage} />
+        <Route exact path="/app/profile" component={ProfilePage} />
+        <Route exact path="/app/plans" component={PlansPage} />
+        <Route exact path="/app/timeline" component={TimelinePage} />
+        <Route exact path="/app/stories" component={StoriesPage} />
+        <Route exact path="/app/checkout" component={CheckoutRoute} />
+        <Route exact path="/app/dashboard" component={DashboardPage} />
+        <Route exact path="/app">
+          <Redirect to="/app/dashboard" />
         </Route>
       </Box>
       <BottomNav 
@@ -258,17 +256,14 @@ const AppContent: React.FC = () => {
     <UserProvider>
       {!session ? (
         <Box>
-          <Route exact path="/login">
+          <Route exact path="/app/login">
             <LoginPage />
           </Route>
-          <Route exact path="/register">
+          <Route exact path="/app/register">
             <RegistrationPage />
           </Route>
-          <Route exact path="/verify">
+          <Route exact path="/app/verify">
             <EmailVerification />
-          </Route>
-          <Route exact path="/">
-            <LandingPage />
           </Route>
           <Route>
             <Redirect to="/" />
@@ -312,8 +307,12 @@ const App: React.FC = () => {
           <Box sx={{ height: '100vh', bgcolor: 'background.default' }}>
             <Router>
               <Switch>
+                <Route exact path="/" component={HomePage} />
                 <Route exact path="/docs/:docPath" component={DocumentationPage} />
-                <Route path="/" component={AppContent} />
+                <Route path="/app" component={AppContent} />
+                <Route>
+                  <Redirect to="/" />
+                </Route>
               </Switch>
             </Router>
           </Box>

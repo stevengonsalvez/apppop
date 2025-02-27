@@ -5,7 +5,7 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import ReactMarkdown from 'react-markdown';
 import { alpha, useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { features } from '../pages/Home'; // Import the features array
+import { features } from './Dashboard'; // Import the features array from Dashboard
 
 const MotionBox = motion(Box);
 

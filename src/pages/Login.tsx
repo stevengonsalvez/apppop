@@ -100,7 +100,7 @@ export const LoginPage: React.FC = () => {
         timestamp: new Date().toISOString()
       });
       
-      history.push('/home');
+      history.push('/app/dashboard');
     } catch (error: any) {
       tagManager.pushEvent('login_error', {
         method: 'email',
@@ -137,7 +137,7 @@ export const LoginPage: React.FC = () => {
         timestamp: new Date().toISOString()
       });
       
-      history.push('/home');
+      history.push('/app/dashboard');
     } catch (error: any) {
       tagManager.pushEvent('social_login_error', {
         method: provider,
@@ -267,7 +267,7 @@ export const LoginPage: React.FC = () => {
                 </Typography>
               </Divider>
 
-              <Link to="/register" style={{ textDecoration: 'none' }}>
+              <Link to="/app/register" style={{ textDecoration: 'none' }}>
                 <Typography color="primary" variant="body2">
                   Don't have an account? Sign up
                 </Typography>
