@@ -511,153 +511,176 @@ export const HomePage: React.FC = () => {
                   mt: { xs: 4, md: 0 }
                 }}
               >
-                {/* Tech Stack Marquee */}
-                <Box 
-                  sx={{ 
+                {/* Newton's Cradle */}
+                <Box
+                  sx={{
                     position: 'absolute',
-                    bottom: '10%',
+                    top: '50%',
                     left: 0,
                     right: 0,
-                    height: 100,
-                    overflow: 'hidden',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    zIndex: 5
                   }}
                 >
-                  <MotionBox
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1, transition: { duration: 1.5 } }}
+                  <Box
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      height: '100%',
-                      width: 'fit-content',
-                      animation: `${marqueeAnimation} 30s linear infinite`,
+                      position: 'relative',
+                      width: '100%',
+                      maxWidth: 900,
+                      height: 350,
+                      marginBottom: 8, // Add more space below for the pendulums and labels
+                      overflow: 'visible'
                     }}
                   >
+                    {/* Ceiling Bar */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '2%',
+                        right: '2%',
+                        height: 12,
+                        bgcolor: 'grey.800',
+                        borderRadius: 4,
+                        boxShadow: '0px 4px 8px rgba(0,0,0,0.5)',
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          top: -5,
+                          left: '5%',
+                          right: '5%',
+                          height: 5,
+                          bgcolor: 'grey.900',
+                          borderRadius: '4px 4px 0 0',
+                          opacity: 0.7
+                        }
+                      }}
+                    />
+                    
+                    {/* Pendulums */}
                     {[
                       { name: 'React', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg', color: '#61DAFB' },
                       { name: 'TypeScript', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg', color: '#007ACC' },
                       { name: 'Supabase', logo: 'https://seeklogo.com/images/S/supabase-logo-DCC676FFE2-seeklogo.com.png', color: '#3ECF8E' },
-                      { name: 'Capacitor', logo: 'https://avatars.githubusercontent.com/u/44631292', color: '#53B9FF' },
+                      { name: 'Capacitor', logo: 'https://seeklogo.com/images/C/capacitor-logo-DF3634DD70-seeklogo.com.png', color: '#53B9FF' },
                       { name: 'Material UI', logo: 'https://mui.com/static/logo.png', color: '#0081CB' },
                       { name: 'Stripe', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg', color: '#635BFF' },
                       { name: 'Analytics', logo: 'https://www.vectorlogo.zone/logos/google_analytics/google_analytics-icon.svg', color: '#E37400' },
-                      { name: 'Clarity', logo: 'https://clarity.microsoft.com/static/images/clarity-logo.svg', color: '#008575' },
+                      { name: 'Clarity', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwI7m9gSh1Jh9ZqcIm21fR2xi_rVStZcCPBA&s', color: '#008575' },
                       { name: 'Vite', logo: 'https://vitejs.dev/logo.svg', color: '#646CFF' },
                       { name: 'Actions', logo: 'https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg', color: '#2088FF' },
                       { name: 'Playwright', logo: 'https://playwright.dev/img/playwright-logo.svg', color: '#2EAD33' },
                       { name: 'Sentry', logo: 'https://cdn.worldvectorlogo.com/logos/sentry-3.svg', color: '#362D59' },
                       { name: 'Ionic', logo: 'https://ionicframework.com/img/meta/logo.png', color: '#3880FF' }
-                    ].map((tech, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          mx: 2,
-                          transition: 'transform 0.3s ease',
-                          '&:hover': {
-                            transform: 'scale(1.2)',
-                          }
-                        }}
-                      >
-                        <Box 
+                    ].map((tech, index, arr) => {
+                      const isFirst = index === 0;
+                      const isLast = index === arr.length - 1;
+                      const isMid = !isFirst && !isLast;
+                      
+                      // Random height factor for each pendulum (between 180px and 260px)
+                      const heightFactor = 180 + (index % 5) * 20;
+                      
+                      // Create unique swinging animation for each pendulum
+                      const swingAnimation = keyframes`
+                        0% { transform: rotate(${-5 - (index % 3) * 5}deg); }
+                        ${25 + (index * 5) % 20}% { transform: rotate(${5 + (index % 4) * 5}deg); }
+                        ${50 + (index * 7) % 20}% { transform: rotate(${-7 - (index % 3) * 4}deg); }
+                        ${75 + (index * 3) % 15}% { transform: rotate(${4 + (index % 5) * 3}deg); }
+                        100% { transform: rotate(${-5 - (index % 3) * 5}deg); }
+                      `;
+                      
+                      // Pulsating glow effect that matches swing timing
+                      const pulseGlow = keyframes`
+                        0%, 100% { filter: drop-shadow(0 0 2px ${alpha(tech.color, 0.3)}); }
+                        ${30 + (index * 7) % 40}% { filter: drop-shadow(0 0 8px ${alpha(tech.color, 0.8)}); }
+                        ${60 + (index * 11) % 30}% { filter: drop-shadow(0 0 2px ${alpha(tech.color, 0.3)}); }
+                      `;
+                      
+                      // Animation duration varies between 4-8 seconds
+                      const animDuration = 4 + (index % 5);
+
+                      return (
+                        <Box
+                          key={index}
                           sx={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: '50%',
-                            backgroundColor: alpha(tech.color, 0.1),
+                            position: 'absolute',
+                            top: 10, // connect to ceiling
+                            left: `${5 + (index * 7.5)}%`, // more spacing between pendulums
+                            width: 2,
+                            height: heightFactor,
+                            bgcolor: 'grey.400',
                             display: 'flex',
+                            flexDirection: 'column',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 1,
+                            transformOrigin: 'top center',
+                            animation: `${swingAnimation} ${animDuration}s infinite ease-in-out`,
+                            animationDelay: `${(index * 0.5) % 2.5}s`,
+                            '&::after': {
+                              content: '""',
+                              position: 'absolute',
+                              bottom: 0,
+                              width: 38, 
+                              height: 38,
+                              borderRadius: '50%',
+                              backgroundColor: alpha(tech.color, 0.2),
+                              boxShadow: `0 0 0 2px ${alpha(tech.color, 0.5)}`,
+                              animation: `${pulseGlow} ${animDuration}s infinite ease-in-out`,
+                              animationDelay: `${(index * 0.5) % 2.5}s`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backdropFilter: 'blur(4px)',
+                            }
                           }}
                         >
-                          <Box 
-                            component="img" 
-                            src={tech.logo} 
-                            alt={tech.name}
-                            sx={{ width: 35, height: 35 }}
-                          />
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              width: 38, 
+                              height: 38,
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              zIndex: 1
+                            }}
+                          >
+                            <Box 
+                              component="img" 
+                              src={tech.logo} 
+                              alt={tech.name}
+                              sx={{ 
+                                width: 22, 
+                                height: 22,
+                                animation: `${pulseGlow} ${animDuration}s infinite ease-in-out`,
+                                animationDelay: `${(index * 0.5) % 2.5}s`,
+                                filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.7))'
+                              }}
+                            />
+                          </Box>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              position: 'absolute',
+                              bottom: -25,
+                              color: alpha(tech.color, 0.9),
+                              fontSize: '0.65rem',
+                              fontWeight: 'medium',
+                              textAlign: 'center',
+                              width: 60,
+                              left: -24,
+                              opacity: 0.9,
+                              textShadow: '0 0 5px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {tech.name}
+                          </Typography>
                         </Box>
-                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
-                          {tech.name}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </MotionBox>
-                  
-                  {/* Duplicate for seamless loop */}
-                  <MotionBox
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1, transition: { duration: 1.5 } }}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      height: '100%',
-                      width: 'fit-content',
-                      animation: `${marqueeAnimation} 30s linear infinite`,
-                      animationDelay: '15s',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                    }}
-                  >
-                    {[
-                      { name: 'React', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg', color: '#61DAFB' },
-                      { name: 'TypeScript', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg', color: '#007ACC' },
-                      { name: 'Supabase', logo: 'https://seeklogo.com/images/S/supabase-logo-DCC676FFE2-seeklogo.com.png', color: '#3ECF8E' },
-                      { name: 'Capacitor', logo: 'https://avatars.githubusercontent.com/u/44631292', color: '#53B9FF' },
-                      { name: 'Material UI', logo: 'https://mui.com/static/logo.png', color: '#0081CB' },
-                      { name: 'Stripe', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg', color: '#635BFF' },
-                      { name: 'Analytics', logo: 'https://www.vectorlogo.zone/logos/google_analytics/google_analytics-icon.svg', color: '#E37400' },
-                      { name: 'Clarity', logo: 'https://clarity.microsoft.com/static/images/clarity-logo.svg', color: '#008575' },
-                      { name: 'Vite', logo: 'https://vitejs.dev/logo.svg', color: '#646CFF' },
-                      { name: 'Actions', logo: 'https://github.githubassets.com/images/modules/site/features/actions-icon-actions.svg', color: '#2088FF' },
-                      { name: 'Playwright', logo: 'https://playwright.dev/img/playwright-logo.svg', color: '#2EAD33' },
-                      { name: 'Sentry', logo: 'https://cdn.worldvectorlogo.com/logos/sentry-3.svg', color: '#362D59' },
-                      { name: 'Ionic', logo: 'https://ionicframework.com/img/meta/logo.png', color: '#3880FF' }
-                    ].map((tech, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          mx: 2,
-                          transition: 'transform 0.3s ease',
-                          '&:hover': {
-                            transform: 'scale(1.2)',
-                          }
-                        }}
-                      >
-                        <Box 
-                          sx={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: '50%',
-                            backgroundColor: alpha(tech.color, 0.1),
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 1,
-                          }}
-                        >
-                          <Box 
-                            component="img" 
-                            src={tech.logo} 
-                            alt={tech.name}
-                            sx={{ width: 35, height: 35 }}
-                          />
-                        </Box>
-                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
-                          {tech.name}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </MotionBox>
+                      );
+                    })}
+                  </Box>
                 </Box>
               </MotionBox>
             </Grid>
