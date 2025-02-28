@@ -440,7 +440,7 @@ export const HomePage: React.FC = () => {
                   <MotionButton
                     variant="contained"
                     size="large"
-                    onClick={() => history.push('/app/login')}
+                    onClick={() => window.location.href = '/app/login'}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ 
                       opacity: 1, 
@@ -462,13 +462,13 @@ export const HomePage: React.FC = () => {
                       animation: `${pulse} 2s infinite`,
                     }}
                   >
-                    Sign In to Try Demo
+                    Sign In to See Demo App
                   </MotionButton>
                   
                   <MotionButton
                     variant="outlined"
                     size="large"
-                    onClick={() => window.open('https://github.com', '_blank')}
+                    onClick={() => window.open('https://github.com/stevengonsalvez/apppop', '_blank')}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ 
                       opacity: 1, 
@@ -818,7 +818,7 @@ export const HomePage: React.FC = () => {
           <MotionButton
             variant="contained"
             size="large"
-            onClick={() => history.push('/app/login')}
+            onClick={() => window.location.href = '/app/login'}
             initial={{ opacity: 0, y: 20 }}
             animate={{ 
               opacity: 1, 
@@ -839,7 +839,7 @@ export const HomePage: React.FC = () => {
               boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
             }}
           >
-            Try Demo App
+            Sign In to See Demo App
           </MotionButton>
         </Container>
       </Box>
@@ -864,16 +864,9 @@ export const HomePage: React.FC = () => {
                 <Button 
                   size="small" 
                   color="inherit"
-                  onClick={() => window.open('https://github.com', '_blank')}
+                  onClick={() => window.open('https://github.com/stevengonsalvez/apppop', '_blank')}
                 >
                   GitHub
-                </Button>
-                <Button 
-                  size="small" 
-                  color="inherit"
-                  onClick={() => window.open('https://discord.com', '_blank')}
-                >
-                  Discord
                 </Button>
                 <Button 
                   size="small" 

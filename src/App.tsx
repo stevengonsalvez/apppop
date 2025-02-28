@@ -256,18 +256,20 @@ const AppContent: React.FC = () => {
     <UserProvider>
       {!session ? (
         <Box>
-          <Route exact path="/app/login">
-            <LoginPage />
-          </Route>
-          <Route exact path="/app/register">
-            <RegistrationPage />
-          </Route>
-          <Route exact path="/app/verify">
-            <EmailVerification />
-          </Route>
-          <Route>
-            <Redirect to="/" />
-          </Route>
+          <Switch>
+            <Route exact path="/app/login">
+              <LoginPage />
+            </Route>
+            <Route exact path="/app/register">
+              <RegistrationPage />
+            </Route>
+            <Route exact path="/app/verify">
+              <EmailVerification />
+            </Route>
+            <Route path="/app">
+              <Redirect to="/app/login" />
+            </Route>
+          </Switch>
         </Box>
       ) : (
         <AuthenticatedApp />
