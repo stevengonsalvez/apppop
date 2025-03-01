@@ -20,7 +20,9 @@ import {
   Search as SearchIcon,
   CreditCard as CreditCardIcon,
   Timeline as TimelineIcon,
+  MenuBook as MenuBookIcon,
 } from '@mui/icons-material';
+import { useState } from 'react';
 
 interface LeftDrawerProps {
   drawerWidth: number;
@@ -35,6 +37,7 @@ const mainNavItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Search', icon: <SearchIcon />, path: '/search' },
   { text: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
+  { text: 'Documentation', icon: <MenuBookIcon />, path: '/docs/introduction' },
 ];
 
 const bottomNavItems = [
@@ -52,13 +55,55 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
   onNavigate,
   onSignOut,
 }) => {
+  // Keep track of the last navigation to prevent duplicate clicks
+  const [lastNavigation, setLastNavigation] = useState<{path: string, timestamp: number} | null>(null);
+  // Track whether navigation is in progress
+  const [navigating, setNavigating] = useState(false);
+
+  // Handle navigation
+  const handleNavigation = (path: string) => {
+    // If we're already navigating or if this is a duplicate click, ignore
+    if (navigating) return;
+    
+    // If we're already on this path, do nothing
+    if (window.location.pathname === `/app${path}`) return;
+    
+    // Prevent duplicate navigation within a short time period
+    const now = Date.now();
+    if (lastNavigation && 
+        lastNavigation.path === path && 
+        now - lastNavigation.timestamp < 500) {
+      return;
+    }
+    
+    // Set navigating state to true to prevent re-renders
+    setNavigating(true);
+    
+    // Update last navigation
+    setLastNavigation({path, timestamp: now});
+    
+    // Block drawer re-rendering during navigation
+    requestAnimationFrame(() => {
+      // Navigate
+      onNavigate(path);
+      
+      // Reset navigating state after a delay
+      setTimeout(() => {
+        setNavigating(false);
+      }, 500);
+    });
+  };
+
   const drawer = (
     <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Toolbar />
       <List>
         {mainNavItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => onNavigate(item.path)}>
+            <ListItemButton 
+              onClick={() => handleNavigation(item.path)}
+              selected={window.location.pathname === `/app${item.path}`}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
@@ -70,7 +115,10 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
       <List>
         {bottomNavItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton onClick={() => onNavigate(item.path)}>
+            <ListItemButton 
+              onClick={() => handleNavigation(item.path)}
+              selected={window.location.pathname === `/app${item.path}`}
+            >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
@@ -91,6 +139,7 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
       component="nav"
       sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
     >
+      {/* Mobile drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -111,9 +160,10 @@ export const LeftDrawer: React.FC<LeftDrawerProps> = ({
           },
         }}
       >
-        {drawer}
+        {!navigating && drawer}
       </Drawer>
 
+      {/* Desktop drawer */}
       <Drawer
         variant="permanent"
         sx={{

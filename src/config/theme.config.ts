@@ -6,6 +6,7 @@ interface ThemeConfig {
   defaultFontScheme: FontSchemeName;
   defaultDarkMode: boolean;
   persistTheme: boolean;
+  documentationColorScheme: ColorSchemeName;
 }
 
 export const themeConfig: ThemeConfig = {
@@ -13,4 +14,5 @@ export const themeConfig: ThemeConfig = {
   defaultFontScheme: 'vibrantSans',
   defaultDarkMode: false,
   persistTheme: false,
+  documentationColorScheme: 'purpleRain',
 }; 

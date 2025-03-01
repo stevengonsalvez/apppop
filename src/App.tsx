@@ -212,13 +212,10 @@ const AuthenticatedApp: React.FC = () => {
         }}
       >
         <Route exact path="/app/verify" component={EmailVerification} />
-        <Route exact path="/app/home" component={HomePage} />
         <Route exact path="/app/profile" component={ProfilePage} />
-        <Route exact path="/app/plans" component={PlansPage} />
         <Route exact path="/app/timeline" component={TimelinePage} />
-        <Route exact path="/app/stories" component={StoriesPage} />
-        <Route exact path="/app/checkout" component={CheckoutRoute} />
         <Route exact path="/app/dashboard" component={DashboardPage} />
+        <Route exact path="/app/docs/:docPath" component={DocumentationPage} />
         <Route exact path="/app">
           <Redirect to="/app/dashboard" />
         </Route>
@@ -266,8 +263,19 @@ const AppContent: React.FC = () => {
             <Route exact path="/app/verify">
               <EmailVerification />
             </Route>
+            <Route exact path="/app/plans">
+              <PlansPage />
+            </Route>
+            <Route exact path="/app/stories">
+              <StoriesPage />
+            </Route>
+            <Route exact path="/app/dashboard">
+              <DashboardPage />
+            </Route>
+            <Route exact path="/app/docs/:docPath" component={DocumentationPage} />
+            <Route exact path="/app/checkout" component={CheckoutRoute} />
             <Route path="/app">
-              <Redirect to="/app/login" />
+              <Redirect to="/app/dashboard" />
             </Route>
           </Switch>
         </Box>

@@ -37,6 +37,7 @@ interface DocumentationCard extends BaseCard {
   type: 'documentation';
   docTitle: string;
   markdownPath: string;
+  progress?: number;
 }
 
 export const features: (FeatureCard | DocumentationCard)[] = [
@@ -49,7 +50,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <FitnessCenterIcon />,
     users: 3,
     image: '/apppop_sample1.jpg',
-    markdownPath: '/docs/theme-system.md',
+    markdownPath: '/docs/theme-system',
     size: 'medium'
   },
   {
@@ -61,7 +62,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <YogaIcon />,
     users: 2,
     image: '/apppop_sample2.jpg',
-    markdownPath: '/docs/components.md',
+    markdownPath: '/docs/components',
     size: 'large'
   },
   {
@@ -74,7 +75,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <BikeIcon />,
     users: 4,
     image: '/apppop_sample3.jpg',
-    markdownPath: '/docs/auth.md',
+    markdownPath: '/docs/auth',
     size: 'small'
   },
   {
@@ -86,7 +87,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <RunIcon />,
     users: 2,
     image: '/apppop_sample4.jpg',
-    markdownPath: '/docs/development.md',
+    markdownPath: '/docs/development',
     size: 'medium'
   },
   {
@@ -98,7 +99,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <YogaIcon />,
     users: 3,
     image: '/apppop_sample5.jpg',
-    markdownPath: '/docs/profile.md',
+    markdownPath: '/docs/profile',
     size: 'small'
   },
   {
@@ -110,7 +111,7 @@ export const features: (FeatureCard | DocumentationCard)[] = [
     icon: <BikeIcon />,
     users: 5,
     image: '/apppop_sample6.jpg',
-    markdownPath: '/docs/api.md',
+    markdownPath: '/docs/api',
     size: 'large'
   },
 ];
@@ -121,7 +122,7 @@ const CardComponent: React.FC<{ item: FeatureCard | DocumentationCard; index: nu
 
   const handleClick = () => {
     if (item.type === 'documentation') {
-      history.push(`/docs/${item.markdownPath.split('/').pop()?.replace('.md', '')}`);
+      history.push(`/app${item.markdownPath}`);
     }
   };
 
@@ -196,7 +197,7 @@ const CardComponent: React.FC<{ item: FeatureCard | DocumentationCard; index: nu
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <MotionChip
-              icon={item.icon}
+              icon={React.isValidElement(item.icon) ? item.icon : undefined}
               label={item.level}
               size="small"
               sx={{

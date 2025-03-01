@@ -320,6 +320,34 @@ export const HomePage: React.FC = () => {
           },
         }}
       >
+        {/* Top Navigation */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
+            p: 2,
+            display: 'flex',
+            justifyContent: 'flex-end'
+          }}
+        >
+          <Button
+            variant="text"
+            color="inherit"
+            onClick={() => window.location.href = '/docs/development'}
+            sx={{
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.1)
+              }
+            }}
+          >
+            Docs
+          </Button>
+        </Box>
+        
         {/* Background Elements */}
         <Box
           sx={{
@@ -867,6 +895,13 @@ export const HomePage: React.FC = () => {
                   onClick={() => window.open('https://github.com/stevengonsalvez/apppop', '_blank')}
                 >
                   GitHub
+                </Button>
+                <Button 
+                  size="small" 
+                  color="inherit"
+                  onClick={() => window.location.href = '/docs/development'}
+                >
+                  Docs
                 </Button>
                 <Button 
                   size="small" 
