@@ -24,6 +24,7 @@ import { DocNavigation } from './DocNavigation';
 import { themeConfig } from '../config/theme.config';
 import { colorSchemes } from '../theme/colorScheme';
 import { keyframes } from '@mui/material/styles';
+import { TableOfContents } from './TableOfContents';
 
 const MotionBox = motion(Box);
 
@@ -50,7 +51,8 @@ const textGlow = keyframes`
   }
 `;
 
-const drawerWidth = 280;
+const drawerWidth = 240;
+const tocWidth = 240; // Width for the table of contents sidebar
 
 interface DocumentationLayoutProps {
   children: React.ReactNode;
@@ -77,7 +79,7 @@ export const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({
     
     // Restore the original color scheme when unmounting
     return () => {
-      setColorScheme(currentColorScheme);
+      setColorScheme(currentColorScheme as any);
     };
   }, [setColorScheme]);
 
@@ -102,9 +104,31 @@ export const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       sx={{ 
-        display: 'flex', 
+        display: 'grid',
+        gridTemplateColumns: { 
+          xs: '1fr', 
+          sm: `${drawerWidth}px 1fr`,
+          md: `${drawerWidth}px minmax(0, 1fr) ${tocWidth}px`
+        },
+        gridTemplateRows: 'auto 1fr',
+        gridTemplateAreas: {
+          xs: `
+            "appbar"
+            "main"
+          `,
+          sm: `
+            "drawer appbar"
+            "drawer main"
+          `,
+          md: `
+            "drawer appbar appbar"
+            "drawer main toc"
+          `
+        },
         minHeight: '100vh',
-        bgcolor: 'background.default'
+        bgcolor: 'background.default',
+        p: 0,
+        m: 0,
       }}
     >
       <CssBaseline />
@@ -113,9 +137,15 @@ export const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          gridArea: 'appbar',
+          width: { 
+            sm: `calc(100% - ${drawerWidth}px)`,
+            md: `calc(100% - ${drawerWidth}px)`
+          },
           ml: { sm: `${drawerWidth}px` },
           bgcolor: 'primary.main',
+          height: '48px',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
         <Toolbar>
@@ -193,16 +223,47 @@ export const DocumentationLayout: React.FC<DocumentationLayoutProps> = ({
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          mt: '64px',
+          gridArea: 'main',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 0,
+          m: 0,
+          mt: '48px',
+          maxWidth: '100%',
+          overflowX: 'hidden',
         }}
       >
-        <Container maxWidth="lg">
+        <Container 
+          maxWidth="md" 
+          disableGutters
+          sx={{ 
+            p: 3,
+            m: 0,
+          }}
+        >
           {children}
         </Container>
+      </Box>
+      
+      {/* Table of Contents */}
+      <Box
+        sx={{
+          gridArea: 'toc',
+          display: { xs: 'none', md: 'block' },
+          p: 2,
+          mt: '48px', // Match the main content margin-top
+          borderLeft: '1px solid',
+          borderColor: 'divider',
+          height: 'calc(100vh - 48px)',
+          position: 'sticky',
+          top: '48px',
+          overflowY: 'auto',
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
+          On this page
+        </Typography>
+        <TableOfContents />
       </Box>
     </MotionBox>
   );

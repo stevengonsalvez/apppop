@@ -87,7 +87,12 @@ export const DocNavigation: React.FC<DocNavigationProps> = ({
   };
 
   const drawer = (
-    <Box sx={{ overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ 
+      overflow: 'auto', 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+    }}>
       <Toolbar sx={{ 
         display: 'flex', 
         alignItems: 'center', 
@@ -231,7 +236,11 @@ export const DocNavigation: React.FC<DocNavigationProps> = ({
   return (
     <Box
       component="nav"
-      sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+      sx={{ 
+        gridArea: 'drawer',
+        width: { sm: drawerWidth }, 
+        flexShrink: { sm: 0 } 
+      }}
     >
       {/* Mobile drawer */}
       <Drawer
@@ -258,8 +267,12 @@ export const DocNavigation: React.FC<DocNavigationProps> = ({
         sx={{
           display: { xs: 'none', sm: 'block' },
           '& .MuiDrawer-paper': { 
-            boxSizing: 'border-box', 
+            boxSizing: 'content-box',
             width: drawerWidth,
+            borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+            mr: 0,
+            pr: 0,
+            border: '2px dashed green', // Temporary outline
           },
         }}
         open

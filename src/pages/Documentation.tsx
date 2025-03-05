@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import { alpha, useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { DocumentationLayout } from '../components/DocumentationLayout';
+import remarkGfm from 'remark-gfm';
+import rehypeSlug from 'rehype-slug';
 
 const MotionBox = motion(Box);
 
@@ -116,6 +118,10 @@ If you believe this is an error, please contact support.`);
         ) : (
           <Box 
             sx={{ 
+              pt: 0,
+              mt: 0,
+              pl: 3,
+              ml: 0,
               '& img': { maxWidth: '100%' },
               '& pre': {
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -138,12 +144,14 @@ If you believe this is an error, please contact support.`);
               },
               '& h1': {
                 color: theme.palette.text.primary,
-                mb: 4
+                mb: 4,
+                scrollMarginTop: '80px'
               },
               '& h2, & h3, & h4': {
                 color: theme.palette.text.primary,
                 mt: 4,
-                mb: 2
+                mb: 2,
+                scrollMarginTop: '80px'
               },
               '& p': {
                 color: theme.palette.text.secondary,
@@ -157,7 +165,12 @@ If you believe this is an error, please contact support.`);
               }
             }}
           >
-            <ReactMarkdown>{content}</ReactMarkdown>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]} 
+              rehypePlugins={[rehypeSlug]}
+            >
+              {content}
+            </ReactMarkdown>
           </Box>
         )}
       </MotionBox>

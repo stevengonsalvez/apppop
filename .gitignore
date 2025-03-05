@@ -60,4 +60,6 @@ yarn-error.log*
 .env.sentry-build-plugin
 config/gtm-credentials.json
 
+#curs
 .cursor/mcp.json
+screenshots/
