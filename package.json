@@ -65,7 +65,7 @@
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
     "@eslint/js": "^8.57.0",
-    "@lhci/cli": "^0.13.x",
+    "@lhci/cli": "^0.15.x",
     "@playwright/test": "^1.42.1",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
